@@ -31,7 +31,7 @@ const GoNoteItems = [
 export default defineConfig({
   appearance: true,
   cleanUrls: true,
-  description: '张恒华的个人网站，存放学习笔记与个人简历。研究领域为软件定义网络（SDN，Software Defined Network）、可编程数据平面（PDP，Programmable Data Plane）。This is Henghua Zhang\'s personal website, where study notes and a resume are stored. The research focus is on Software-Defined Networking (SDN) and Programmable Data Plane (PDP).',
+  description: '张恒华的个人网站，存放学习笔记与个人简历。研究领域为软件定义网络（SDN，Software Defined Network）、可编程数据平面（PDP，Programmable Data Plane）。This is Henghua Zhang\'s personal website, where study notes and a resume are stored. The research focus is on SDN and PDP.',
   head: [
     [
       'meta',
