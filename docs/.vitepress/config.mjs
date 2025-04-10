@@ -16,6 +16,7 @@ const SDNNoteItems = [
         collapsed: true,
         items: [
           { text: 'FlowStalker', link: '/sdn/reading/monitoring/FlowStalker' },
+          { text: 'PPM', link: '/sdn/reading/monitoring/ppm' },
         ]
       },
     ]
