@@ -153,3 +153,19 @@ FlowStalker 引入了一种称为 **Crawler Packet (Cp)** 的机制，用于高�
 <span id="Marple">[12]</span> S. Narayana, A. Sivaraman, V. Nathan, P. Goyal, V. Arun, M. Alizadeh, V. Jeyakumar, and C. Kim, "Language-Directed Hardware Design for Network Performance Monitoring," in SIGCOMM 2017, Los Angeles, CA, August 2017.
 
 <span id="StreaMon">[13]</span> M. Bonola, G. Bianchi, G. Picierro, S. Pontarelli, and M. Monaci, "Streamon: A data-plane programming abstraction for software-defined stream monitoring," IEEE Transactions on Dependable and Secure Computing, vol. 14, no. 6, pp. 664–678, Nov 2017.
+
+## BibTeX 格式引用
+
+```BibTeX
+@INPROCEEDINGS{FlowStalker,
+  author={Castanheira, Lucas and Parizotto, Ricardo and Schaeffer-Filho, Alberto E.},
+  booktitle={ICC 2019 - 2019 IEEE International Conference on Communications (ICC)}, 
+  title={FlowStalker: Comprehensive Traffic Flow Monitoring on the Data Plane using P4}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Monitoring;Control systems;Crawlers;Measurement;IP networks;Registers;Telemetry},
+  doi={10.1109/ICC.2019.8761197}
+}
+```
