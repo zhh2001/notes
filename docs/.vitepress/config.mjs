@@ -26,6 +26,7 @@ const SDNNoteItems = [
 const GoNoteItems = [
   { text: 'GoLang', link: '/go/golang' },
   { text: 'Goroutine', link: '/go/goroutine' },
+  { text: 'Gin', link: '/go/Gin' },
   { text: 'gRPC', link: '/go/grpc' },
 ]
 
