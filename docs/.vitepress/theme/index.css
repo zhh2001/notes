@@ -39,3 +39,7 @@
 .ccf-page .container {
     max-width: none !important;
 }
+
+.MathJax {
+    position: static !important;
+}
