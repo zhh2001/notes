@@ -50,6 +50,16 @@ const SDNNoteItems = [
     ]
   },
   {
+    text: 'Writing',
+    link: '/sdn/writing/',
+    items: [
+      {
+        text: 'Formula',
+        link: '/sdn/writing/formula',
+      }
+    ],
+  },
+  {
     text: 'CCF',
     link: '/sdn/ccf'
   },
