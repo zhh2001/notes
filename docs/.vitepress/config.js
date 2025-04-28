@@ -56,7 +56,11 @@ const SDNNoteItems = [
       {
         text: 'Formula',
         link: '/sdn/writing/formula',
-      }
+      },
+      {
+        text: 'Algorithm',
+        link: '/sdn/writing/algorithm',
+      },
     ],
   },
   {
