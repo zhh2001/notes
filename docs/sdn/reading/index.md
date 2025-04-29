@@ -13,4 +13,5 @@
 |   7 | [A Survey on P4 Challenges in Software Defined Networks: P4 Programming](/sdn/reading/paper#a-survey-on-p4-challenges-in-software-defined-networks-p4-programming)                                                   |
 |   8 | [FlowStalker: Comprehensive Traffic Flow Monitoring on the Data Plane using P4](/sdn/reading/monitoring/FlowStalker)                                                                                                 |
 |   9 | [P4-Based Proactive Monitoring Scheme in Software-Defined Networks](/sdn/reading/monitoring/ppm)                                                                                                                     |
-|  10 | [A Lightweight Scheme of Active-Port-Aware Monitoring in Software-Defined Networks](/sdn/reading/monitoring/apam)                                                                                                     |
+|  10 | [A Lightweight Scheme of Active-Port-Aware Monitoring in Software-Defined Networks](/sdn/reading/monitoring/apam)                                                                                                    |
+|  11 | [Flexible sampling-based in-band network telemetry in programmable data plane](/sdn/reading/monitoring/FS-INT)                                                                                                       |

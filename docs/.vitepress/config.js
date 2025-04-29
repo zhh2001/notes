@@ -42,6 +42,10 @@ const SDNNoteItems = [
             link: '/sdn/reading/monitoring/FlowStalker'
           },
           {
+            text: 'FS-INT',
+            link: '/sdn/reading/monitoring/FS-INT'
+          },
+          {
             text: 'PPM',
             link: '/sdn/reading/monitoring/ppm'
           },
