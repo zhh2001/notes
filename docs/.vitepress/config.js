@@ -79,6 +79,10 @@ const SDNNoteItems = [
     text: 'CCF',
     link: '/sdn/ccf'
   },
+  {
+    text: 'Journal',
+    link: '/sdn/journal'
+  },
 ]
 const GoNoteItems = [
   {
