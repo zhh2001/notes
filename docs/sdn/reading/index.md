@@ -1,3 +1,7 @@
+---
+aside: false
+---
+
 # 文献阅读
 
 每周都会看几篇 SDN 领域相关的论文，偶尔做点笔记和总结。下面是已经看过的文献，点击可以跳转笔记查看。
@@ -15,3 +19,6 @@
 |   9 | [P4-Based Proactive Monitoring Scheme in Software-Defined Networks](/sdn/reading/monitoring/ppm)                                                                                                                     |
 |  10 | [A Lightweight Scheme of Active-Port-Aware Monitoring in Software-Defined Networks](/sdn/reading/monitoring/apam)                                                                                                    |
 |  11 | [Flexible sampling-based in-band network telemetry in programmable data plane](/sdn/reading/monitoring/FS-INT)                                                                                                       |
+|  12 | [FAPM: A Fake Amplification Phenomenon Monitor to Filter DRDoS Attacks With P4 Data Plane](/sdn/reading/monitoring/fapm)                                                                                                       |
+|  13 | [Deterministic and Probabilistic P4-Enabled Lightweight In-Band Network Telemetry](/sdn/reading/monitoring/lint)                                                                                                       |
+|  14 | [Marina: Realizing ML-Driven Real-Time Network Traffic Monitoring at Terabit Scale](/sdn/reading/monitoring/marina)                                                                                                       |

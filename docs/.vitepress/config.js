@@ -38,12 +38,24 @@ const SDNNoteItems = [
             link: '/sdn/reading/monitoring/apam'
           },
           {
+            text: 'DLINT & PINT',
+            link: '/sdn/reading/monitoring/lint'
+          },
+          {
             text: 'FlowStalker',
             link: '/sdn/reading/monitoring/FlowStalker'
           },
           {
+            text: 'FAPM',
+            link: '/sdn/reading/monitoring/fapm'
+          },
+          {
             text: 'FS-INT',
             link: '/sdn/reading/monitoring/FS-INT'
+          },
+          {
+            text: 'Marina',
+            link: '/sdn/reading/monitoring/marina'
           },
           {
             text: 'PPM',
