@@ -10,6 +10,10 @@ const SDNNoteItems = [
     link: '/sdn/p4_exercise'
   },
   {
+    text: 'P4 INT',
+    link: '/sdn/int'
+  },
+  {
     text: 'P4 Utils',
     link: '/sdn/p4_utils'
   },
@@ -140,6 +144,8 @@ const keywords = [
   'PDP',
   'Programming Protocol-independent Packet Processors',
   'P4',
+  'INT',
+  'In-band Network Telemetry',
   'OpenFlow',
   'Mininet',
   'iPerf',
