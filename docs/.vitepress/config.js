@@ -42,7 +42,7 @@ const SDNNoteItems = [
             link: '/sdn/reading/monitoring/apam'
           },
           {
-            text: 'DLINT & PINT',
+            text: 'DLINT & PLINT',
             link: '/sdn/reading/monitoring/lint'
           },
           {
