@@ -1096,7 +1096,7 @@ mininet> xterm h1 h11 h2 h22
 ./receive.py
 ```
 
-5. 在 `h22` 的 XTerm 中，启动 iperf UDP 服务器：
+5. 在 `h22` 的 XTerm 中，启动 iPerf UDP 服务器：
 
 ```shell
 iperf -s -u
@@ -1110,7 +1110,7 @@ iperf -s -u
 
 消息“P4 is cool”将在 `h2` 的 xterm 中收到。
 
-7. 在 `h11` 的 XTerm 中，启动 iperf 客户端，持续发送数据 15 秒：
+7. 在 `h11` 的 XTerm 中，启动 iPerf 客户端，持续发送数据 15 秒：
 
 ```shell
 iperf -c 10.0.2.22 -t 15 -u
@@ -1186,4 +1186,152 @@ iperf -c 10.0.2.22 -t 15 -u
      tos       = 0x1
      tos       = 0x1
      tos       = 0x1
+```
+
+## 5 练习五：多跳路由检测
+
+练习所在路径：`./tutorials/exercises/mri`
+
+### 5.1 介绍
+
+这个练习的目标是使用精简版的[带内网络遥测](/sdn/int) (In-band Network Telemetry，INT)（P4 团队称之为多跳路由检测 (Multi-Hop Route Inspection，MRI)）来扩展基本的 L3 转发功能。
+
+MRI 允许用户跟踪每个数据包所经过的路径和队列长度。为了支持此功能，我们需要编写一个 P4 程序，在每个数据包的头部堆栈中附加一个 ID 和队列长度。在目的地，交换机 ID 的序列与路径相对应，每个 ID 后面跟着交换机端口的队列长度。
+
+与之前一样，练习已经定义了控制平面规则，因此我们只需实现 P4 程序的数据平面逻辑。
+
+### 5.2 步骤一：运行初始代码
+
+练习目录中包含一个初步实现了 L3 转发功能的 P4 程序框架 `mri.p4`。接下来，我们的任务是扩展它，使其能够正确地添加 MRI 自定义报头。
+
+在此之前，让我们编译未完成的 `mri.p4` 并在 Mininet 中启动一个交换机来测试其行为。
+
+1. 在 Shell 中运行：
+
+    ```shell
+    make
+    ```
+
+    这将会：
+
+    - 编译 `mri.p4`；
+    - 启动一个 Mininet 的实例，创建三个交换机（`s1`、`s2`、`s3`）组成三角形拓扑，创建五个主机，其中 `h1` 和 `h11` 连接在 `s1` 上，`h2` 和 `h22` 连接在 `s2` 上，`h3` 连接在 `s3` 上；
+    - 主机分配的 IP 为 `10.0.1.1`、`10.0.2.2` 等 (`10.0.<Switchid>.<hostID>`)；
+    - 控制平面根据 `sx-runtime.json` 在各个交换机中配置 P4 表。
+
+2. 我们将从 `h1` 向 `h2` 发送低速率流量，并从 `h11` 向 `h22` 发送高速率 iPerf 流量。`s1` 和 `s2` 之间的链路是两个流之间的公共链路，并且由于 `topology.json` 中将其带宽降低到 `512kbps`，因此成为了瓶颈。因此，如果我们在 `h2` 处捕获数据包，应该会看到该链路的队列大小较高。
+![Topo](/p4/mri_topo.png)
+
+3. 现在我们会看到 Mininet 命令提示符。分别为 h1、h11、h2、h22 打开四个终端：
+
+    ```bash
+    mininet> xterm h1 h2 h11 h22
+    ```
+
+4. 在 `h2` 的 XTerm 里，启动捕获数据包的服务器：
+
+    ```shell
+    ./receive.py
+    ```
+
+5. 在 `h22` 的 XTerm 中，启动 iPerf UDP 服务器：
+
+    ```shell
+    iperf -s -u
+    ```
+
+6. 在 `h1` 的 XTerm 中，使用 `send.py` 每秒发送一个数据包到 `h2`，持续 30 秒：
+
+    ```shell
+    ./send.py 10.0.2.2 "P4 is cool" 30
+    ```
+
+消息“P4 is cool”将在 `h2` 的 xterm 中收到。
+
+7. 在 `h11` 的 XTerm 中，启动 iPerf 客户端，持续发送数据 15 秒：
+
+```shell
+iperf -c 10.0.2.22 -t 15 -u
+```
+
+8. 在 `h2` 处，MRI 标头没有 hop 信息（`count=0`）。
+
+9. 输入 `exit` 关闭每个 XTerm 窗口。
+
+我们应该已经看到主机 `h2` 收到了消息，但没有任何关于消息路径的信息。我们的任务是扩展 `mri.p4` 中的代码，实现 MRI 逻辑来记录路径。
+
+### 5.3 步骤二：实现 MRI
+
+`mri.p4` 文件包含一个 P4 程序的框架，其中关键逻辑部分已用 `TODO` 注释替换。这些注释应该可以指导我们的实现 MRI。
+
+MRI 需要两个自定义报头。第一个报头 `mri_t` 包含一个字段 `count`，用于指示后续交换机 ID 的数量。第二个报头 `switch_t` 包含数据包经过的每个交换机跳数的交换机 ID 和队列深度字段。
+
+实现 MRI 的最大挑战是处理解析这两个报头的递归逻辑。我们将使用 `parser_metadata` 字段 `remaining` 来跟踪需要解析的 `switch_t` 报头数量。在 `parse_mri` 状态下，此字段应设置为 `hdr.mri.count`。在 `parse_swtrace` 状态下，此字段应递减。`parse_swtrace` 状态将转换为自身状态，直到 `remaining` 为 `0`。
+
+MRI 自定义报头将包含在 IP Options 报头中。IP Options 报头包含一个字段 `option`，用于指示选项的类型。我们将使用特殊类型 31 来指示 MRI 报头的存在。
+
+除了解析器逻辑之外，我们还需要在 `egress`、`swtrace` 中添加一个表来存储交换机 ID 和队列深度，以及一些操作来增加 `count` 字段并附加 `switch_t` 报头。
+
+完整的 `mri.p4` 将包含以下部分：
+
+1. 以太网 (`ethernet_t`)、IPv4 (`ipv4_t`)、IP Options (`ipv4_option_t`)、MRI (`mri_t`) 和交换机 (`switch_t`) 的标头类型定义。
+2. 以太网、IPv4、IP Options、MRI 和 Switch 的解析器将填充 `ethernet_t`、`ipv4_t`、`ipv4_option_t`、`mri_t` 和 `switch_t`。
+3. 使用 `mark_to_drop()` 来丢弃数据包。
+4. 一个 `ipv4_forward` 动作：
+   1. 设置下一跳的出口端口；
+   2. 使用下一跳的地址更新以太网目标地址；
+   3. 使用交换机的地址更新以太网源地址；
+   4. 递减 TTL。
+5. 入口控制：
+   1. 定义一个表，用于读取 IPv4 目标地址，并调用 `drop` 或 `ipv4_forward`。
+   2. 一个 `apply` 块，用于应用该表。
+6. 在出口处，一个 `add_swtrace` 动作将添加交换机 ID 和队列深度。
+7. 出口控制，应用 `swtrace` 表来存储交换机 ID 和队列深度，并调用 `add_swtrace`。
+8. 反解析器，用于选择字段插入传出数据包的顺序。
+9. 包含解析器、控制、校验和验证及重新计算以及反解析器的 `package` 实例。
+
+### 5.4 步骤三：运行完整代码
+
+按照步骤一中的说明操作。这次，当 `h1` 的报文传递到 `h2` 时，我们会看到数据包经过的交换机序列以及相应的队列深度。预期输出将如下所示，其中显示了 MRI 报头（`count` 为 2），交换机 ID（`swid`）分别为 2 和 1。公共链路（从 `s1` 到 `s2`）上的队列深度较高。
+
+```text
+got a packet
+###[ Ethernet ]###
+  dst       = 00:04:00:02:00:02
+  src       = f2:ed:e6:df:4e:fa
+  type      = 0x800
+###[ IP ]###
+     version   = 4L
+     ihl       = 10L
+     tos       = 0x0
+     len       = 42
+     id        = 1
+     flags     =
+     frag      = 0L
+     ttl       = 62
+     proto     = udp
+     chksum    = 0x60c0
+     src       = 10.0.1.1
+     dst       = 10.0.2.2
+     \options   \
+      |###[ MRI ]###
+      |  copy_flag = 0L
+      |  optclass  = control
+      |  option    = 31L
+      |  length    = 20
+      |  count     = 2
+      |  \swtraces  \
+      |   |###[ SwitchTrace ]###
+      |   |  swid      = 2
+      |   |  qdepth    = 0
+      |   |###[ SwitchTrace ]###
+      |   |  swid      = 1
+      |   |  qdepth    = 17
+###[ UDP ]###
+        sport     = 1234
+        dport     = 4321
+        len       = 18
+        chksum    = 0x1c7b
+###[ Raw ]###
+           load      = 'P4 is cool'
 ```
