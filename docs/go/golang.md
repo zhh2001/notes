@@ -1359,3 +1359,136 @@ func TestAdd(t *testing.T) {
 	}
 }
 ```
+
+## 21 泛型
+
+### 21.1 函数上使用
+
+在函数名后添加 `[T type]` 声明泛型：
+
+```go
+func Add[T int | float64 | string](a, b T) T {
+	return a + b
+}
+
+func main() {
+	fmt.Println(Add[int](1, 2))            // 3
+	fmt.Println(Add[float64](1.1, 2.1))    // 3.2
+	fmt.Println(Add[string]("1.1", "2.2")) // 1.12.2
+}
+```
+
+如果不使用泛型，刚刚的函数就得写成下面这样：
+
+```go
+func IAdd(a, b interface{}) interface{} {
+	switch a.(type) {
+	case int:
+		return a.(int) + b.(int)
+	case float64:
+		return a.(float64) + b.(float64)
+	case string:
+		return a.(string) + b.(string)
+	}
+	return nil
+}
+
+func main() {
+	fmt.Println(IAdd(1, 2))         // 3
+	fmt.Println(IAdd(1.1, 2.1))     // 3.2
+	fmt.Println(IAdd("1.1", "2.2")) // 1.12.2
+}
+```
+
+### 21.2 Map上使用
+
+```go
+type MyMap[
+	KEY int | string,
+	VALUE float32 | float64,
+] map[KEY]VALUE
+
+func main() {
+	m := MyMap[string, float64]{}
+}
+```
+
+### 21.3 结构体上使用
+
+```go
+type S[
+	T1 string | float64,
+	T2 int | uint,
+] struct {
+	A T1
+	B T2
+}
+
+func main() {
+	s := S[string, uint]{"Hello", 2025}
+	fmt.Println(s) // {Hello 2025}
+}
+```
+
+## 22 函数选项模式
+
+函数选项模式在 Go 中是一种很主流的设计模式。
+
+例如，有如下结构体表示数据库连接配置：
+
+```go
+type DBOptions struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	DBName   string
+}
+```
+
+定义一个函数类型 `Option`，它接收一个指向配置结构体的指针，目的是修改该结构体的字段：
+
+```go
+type Option func(*DBOptions)
+```
+
+声明选项函数，即对配置结构体进行某项定制化设置的函数。例如：
+
+```go
+func WithHost(host string) Option {
+	return func(o *DBOptions) {
+		o.Host = host
+	}
+}
+
+func WithPort(port int) Option {
+	return func(o *DBOptions) {
+		o.Port = port
+	}
+}
+```
+
+构造函数中，先设定默认值，然后遍历用户提供的选项函数，依次修改配置：
+
+```go
+func NewDBClient(options ...Option) *DBOptions {
+	// 先实例化好 DBOptions，填充上默认值
+	dbOptions := &DBOptions{
+		Host: "127.0.0.1",
+		Port: 3306,
+	}
+	for _, option := range options {
+		option(dbOptions)
+	}
+	return dbOptions
+}
+
+func main() {
+	// 只修改了 Host 字段，其它使用默认值
+	dbOptions := NewDBClient(WithHost("192.168.0.1"))
+	fmt.Println(dbOptions.Host) // 192.168.0.1
+	fmt.Println(dbOptions.Port) // 3306
+}
+```
+
+
