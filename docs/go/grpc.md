@@ -121,6 +121,23 @@ protoc \
 
 生成的文件（如 `hello.pb.go`）包含数据结构的序列化/反序列化方法。
 
+如果 `hello.proto` 导入了其他的 `.proto` 文件，例如：
+
+```proto
+import "google/api/annotations.proto";
+```
+
+则需要在使用 `protoc` 生成代码时指定这个文件所在的路径，假设它的路径为 `../third_party/google/api/annotations.proto`，那么命令为：
+
+```shell{2,3}
+protoc \
+    --proto_path=. \
+    --proto_path=../third_party \
+    --go_out=. \
+    --go-grpc_out=. \
+	hello.proto
+```
+
 ### 2.4 数据类型
 
 下表为 Proto 的数据类型，以及自动生成的对应语言的数据类型：
