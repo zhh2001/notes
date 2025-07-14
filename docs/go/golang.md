@@ -166,6 +166,19 @@ const (
 
 `iota` 是一个特殊常量，在 `const` 内部第一行的值为 `0`，后面每行依次递增加一。
 
+`const` 声明的值在编译期就已确定的、不变的。所以，`const` 不能用于声明以下几类东西：
+
+| 类型                | 原因                    | 错误示例                                   |
+| ----------------- | --------------------- | ------------------------------------ |
+| **切片 `slice`**     | 切片是引用类型，包含指针，运行时才能确定  | `const s = []int{1, 2, 3}`         |
+| **映射 `map`**       | map 是引用类型，运行时构建       | `const m = map[int]int{}` |
+| **通道 `chan`**      | channel 是运行时机制        | `const ch = make(chan int)`        |
+| **数组 `array`**     | 虽然数组是值类型，但内容非编译期常量不可用 | `const arr = [2]int{1, 2}`      |
+| **结构体 `struct`**   | struct 中可能包含运行时信息     | `const p = Person{}`    |
+| **接口 `interface`** | 接口是动态类型，编译期不确定        | `const r io.Reader = ...`          |
+| **函数或方法**         | 函数是运行时对象              | `const f = fmt.Println`            |
+| **运行时计算的表达式**     | 常量不能依赖变量、函数调用等        | `const x = math.Sin(1.0)`          |
+
 ## 4 基本数据类型
 
 ### 4.1 布尔
@@ -275,6 +288,7 @@ fmt.Println(s1 == s2)  // true
 | 格式  | 含义               |
 | ----- | ------------------ |
 | `%v`  | 以默认格式输出     |
+| `%+v` | 在打印结构体时，会显示字段名和字段值 |
 | `%#v` | 以Go语法的格式输出 |
 | `%T`  | 输出值的类型       |
 | `%%`  | 输出一个百分号     |
@@ -1491,4 +1505,181 @@ func main() {
 }
 ```
 
+## 23 错误处理（`error`）
 
+### 23.1 什么是 `error`
+
+在 Go 中，`error` 是一种内建接口，用于表示函数执行中的错误状态。
+
+```go
+type error interface {
+	Error() string
+}
+```
+
+任何实现了 `Error() string` 方法的类型都可以被视为一个 `error`。
+
+### 23.2 返回 `error` 的基本用法
+
+Go 的函数推荐返回 `(result, error)` 这样的双值结构：
+
+```go
+func divide(a, b float64) (float64, error) {
+	if b == 0 {
+		return 0, fmt.Errorf("cannot divide by zero")
+	}
+	return a / b, nil
+}
+```
+
+调用时进行错误判断：
+
+```go
+result, err := divide(10, 0)
+if err != nil {
+	fmt.Println("Error:", err)
+} else {
+	fmt.Println("Result:", result)
+}
+```
+
+### 23.3 创建错误的几种方式
+
+1. 使用内建 `errors.New`
+	```go
+	import "errors"
+
+	err := errors.New("something went wrong")
+	```
+
+2. 使用 `fmt.Errorf`
+	```go
+	err := fmt.Errorf("invalid input: %v", input)
+	```
+
+3. 使用错误包装
+	```go
+	baseErr := errors.New("disk error")
+	err := fmt.Errorf("upload failed: %w", baseErr) // %w 表示包装
+	```
+
+### 23.4 判断和提取底层错误
+
+使用 `errors.Is` 和 `errors.As` 判断错误类型或提取特定错误。
+
+1. `errors.Is` 判断是否是某种错误
+	```go
+	if errors.Is(err, os.ErrNotExist) {
+		fmt.Println("File does not exist")
+	}
+	```
+
+2. `errors.As` 判断并提取特定错误类型
+	```go
+	var pathErr *os.PathError
+	if errors.As(err, &pathErr) {
+		fmt.Println("Path error:", pathErr.Path)
+	}
+	```
+
+### 23.5 打印调用栈
+
+```go{3}
+import (
+	"fmt"
+	"github.com/pkg/errors"
+)
+
+func div(a, b int) (int, error) {
+	if b == 0 {
+		return 0, errors.New("division by zero")
+	}
+	return a / b, nil
+}
+
+func main() {
+	_, err := div(1, 0)
+	if err != nil {
+		fmt.Printf("Err: %+v\n", err)
+	}
+}
+```
+
+输出信息如下：
+
+```txt
+Err: division by zero
+main.div
+	C:/Users/Zhang/GolandProjects/learn/main.go:11
+main.main
+	C:/Users/Zhang/GolandProjects/learn/main.go:17
+runtime.main
+	C:/Program Files/Go/src/runtime/proc.go:283
+runtime.goexit
+	C:/Program Files/Go/src/runtime/asm_amd64.s:1700
+```
+
+### 23.6 打印错误栈
+
+```go{3,25}
+import (
+	"fmt"
+	"github.com/pkg/errors"
+)
+
+type Student struct {
+	Name string
+	Age  int
+}
+
+func (s *Student) SetName(name string) error {
+	if name == "" {
+		return errors.New("name is empty")
+	}
+	s.Name = name
+	return nil
+}
+
+func NewStudent() (*Student, error) {
+	stu := &Student{
+		Age: 18,
+	}
+	err := stu.SetName("")
+	if err != nil {
+		return nil, errors.Wrap(err, "set name failed")
+	}
+	return stu, nil
+}
+
+func main() {
+	_, err := NewStudent()
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+}
+```
+
+输出信息如下：
+
+```txt
+name is empty
+main.(*Student).SetName
+	C:/Users/Zhang Henghua/GolandProjects/learn/main.go:15
+main.NewStudent
+	C:/Users/Zhang Henghua/GolandProjects/learn/main.go:25
+main.main
+	C:/Users/Zhang Henghua/GolandProjects/learn/main.go:33
+runtime.main
+	C:/Program Files/Go/src/runtime/proc.go:283
+runtime.goexit
+	C:/Program Files/Go/src/runtime/asm_amd64.s:1700
+set name failed
+main.NewStudent
+	C:/Users/Zhang Henghua/GolandProjects/learn/main.go:27
+main.main
+	C:/Users/Zhang Henghua/GolandProjects/learn/main.go:33
+runtime.main
+	C:/Program Files/Go/src/runtime/proc.go:283
+runtime.goexit
+	C:/Program Files/Go/src/runtime/asm_amd64.s:1700
+```
