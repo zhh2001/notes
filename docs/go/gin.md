@@ -4,32 +4,11 @@ Gin 是一个 Go 语言写的 Web 框架。
 
 ## 1 安装
 
-```shell
-go get -u github.com/gin-gonic/gin
-```
+<<< @/go/codes/gin/install.sh
 
 ## 2 HelloWorld
 
-```go
-package main
-
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
-func helloWorld(context *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{
-        "message": "world",
-    })
-}
-
-func main() {
-	router := gin.Default()
-	router.GET("/hello", helloWorld)
-	router.Run("localhost:8000")
-}
-```
+<<< @/go/codes/gin/hello_world.go
 
 ## 3 路由分组
 
@@ -339,65 +318,7 @@ func signUp(context *gin.Context) {
 
 可将错误信息转成中文：
 
-```go
-import (
-	"errors"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/locales/en"
-	"github.com/go-playground/locales/zh"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh"
-	"net/http"
-)
-
-func InitTrans(locale string) (err error) {
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		zhT := zh.New()
-		enT := en.New()
-		uni := ut.New(zhT, zhT, enT)
-		trans, ok = uni.GetTranslator(locale)
-		if !ok {
-			return errors.New("translator not found")
-		}
-		switch locale {
-		case "zh":
-			if err := zh_translations.RegisterDefaultTranslations(v, trans); err != nil {
-				return err
-			}
-		case "en":
-			if err := en_translations.RegisterDefaultTranslations(v, trans); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-var trans ut.Translator
-
-func main() {
-	if err := InitTrans("zh"); err != nil {
-		fmt.Println(err)
-	}
-	router := gin.Default()
-	router.POST("/signUp", signUp)
-	router.Run("localhost:8000")
-}
-
-func signUp(context *gin.Context) {
-	var info SignUpInfo
-	if err := context.ShouldBindJSON(&info); err != nil {
-		errs, _ := err.(validator.ValidationErrors)
-		context.JSON(http.StatusBadRequest, gin.H{"error": errs.Translate(trans)})
-		return
-	}
-	context.JSON(http.StatusOK, gin.H{"msg": "注册成功"})
-}
-```
+<<< @/go/codes/gin/translation.go
 
 此时，错误信息将转为中文：
 
@@ -498,29 +419,4 @@ func (c *Context) Abort() {
 
 关闭程序的时候可能有请求还没有处理完，此时处理过程就会被迫中断。优雅退出其实就是在程序关闭时，不暴力关闭，而是要等待进程中的逻辑处理完成后，才关闭。
 
-```go
-import (
-	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-
-	"github.com/gin-gonic/gin"
-)
-
-func main() {
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
-	go func() {
-		_ = router.Run(":8000")
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-	fmt.Println("关闭服务")
-}
-```
+<<< @/go/codes/gin/quit.go

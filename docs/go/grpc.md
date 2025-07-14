@@ -86,10 +86,8 @@ Protocol Buffers（protobuf）​​ 是 Google 开发的一种高效、跨语�
 1. 在 [https://github.com/protocolbuffers/protobuf/releases](https://github.com/protocolbuffers/protobuf/releases) 下载后解压。
 2. 将解压出来的 `bin` 目录配置到环境变量。
 3. 执行下面的命令安装协议编译器插件：
-```shell
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-```
+
+	<<< @/go/codes/grpc/install.sh
 
 ### 2.2 定义数据结构
 
@@ -344,23 +342,7 @@ gRPC 是一个开源高性能 RPC 框架，可以在任何环境中运行。
 
 ### 3.1 定义服务
 
-```proto
-syntax = "proto3";
-
-option go_package = ".;proto";
-
-service Greeter{
-  rpc SayHello(HelloRequest) returns (HelloResponse);
-}
-
-message HelloRequest {
-  string name = 1;
-}
-
-message HelloResponse {
-  string msg = 1;
-}
-```
+<<< @/go/codes/grpc/hello.proto
 
 ### 3.2 生成代码
 

@@ -1621,43 +1621,7 @@ runtime.goexit
 
 ### 23.6 打印错误栈
 
-```go{3,25}
-import (
-	"fmt"
-	"github.com/pkg/errors"
-)
-
-type Student struct {
-	Name string
-	Age  int
-}
-
-func (s *Student) SetName(name string) error {
-	if name == "" {
-		return errors.New("name is empty")
-	}
-	s.Name = name
-	return nil
-}
-
-func NewStudent() (*Student, error) {
-	stu := &Student{
-		Age: 18,
-	}
-	err := stu.SetName("")
-	if err != nil {
-		return nil, errors.Wrap(err, "set name failed")
-	}
-	return stu, nil
-}
-
-func main() {
-	_, err := NewStudent()
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
-}
-```
+<<< @/go/codes/golang/error_stack.go{3,25}
 
 输出信息如下：
 
@@ -1683,3 +1647,192 @@ runtime.main
 runtime.goexit
 	C:/Program Files/Go/src/runtime/asm_amd64.s:1700
 ```
+
+## 24 AST 代码生成
+
+假设我们要维护状态码的相关代码，可能会这样来写：
+
+```go
+const (
+	OK            Code = 0 // OK
+	InvalidParams Code = 1 // 参数错误
+	Timeout       Code = 2 // 超时
+)
+
+var mapCodeDesc = map[int]string{
+	OK:            "OK",
+	InvalidParams: "参数错误",
+	Timeout:       "超时",
+}
+
+func GetCodeDesc(code int) string {
+	if desc, ok := mapCodeDesc[code]; ok {
+		return desc
+	}
+	return "未知错误"
+}
+```
+
+但是，有没有一种办法可以只维护状态码，而状态码的描述映射和获取函数都自动生成呢。
+
+通过 `stringer` 工具能够做到这点。先安装：
+
+```shell
+go install golang.org/x/tools/cmd/stringer
+```
+
+此时原本的代码文件就可以写为：
+
+```go
+//go:generate stringer -type Code -linecomment
+
+package code
+
+type Code int64
+
+const (
+	OK            Code = 0 // OK
+	InvalidParams Code = 1 // 参数错误
+	Timeout       Code = 2 // 超时
+)
+
+```
+
+然后在代码文件同级目录下执行：
+
+```go
+go generate .
+```
+
+此时，会多出一个文件 `code_string.go`：
+
+<<< @/go/codes/golang/code_string.go
+
+### 24.1 什么是 AST
+
+- AST（Abstract Syntax Tree）是编程语言源代码的树状结构表示。
+- 在 Go 中，AST 表示形式由 `go/ast` 和 `go/token` 标准库提供。
+- 借助 AST，我们可以**动态构建代码**，然后导出为 `.go` 文件。
+
+### 24.2 常用标准库
+
+| 包名 | 用途 |
+|------|------|
+| `go/ast` | 抽象语法树节点结构和操作 |
+| `go/token` | 源码位置（token位置管理） |
+| `go/parser` | 源代码 -> AST |
+| `go/printer` | AST -> 源代码输出 |
+| `go/format` | 美化输出代码 |
+
+### 24.3 基本步骤
+
+以构造函数生成器为例。
+
+#### 24.3.1 步骤一：导入包
+
+```go
+import (
+	"go/ast"
+	"go/token"
+	"go/printer"
+	"go/format"
+	"os"
+)
+```
+
+#### 24.3.2 步骤二：构造代码结构
+
+我们创建一个函数：
+
+```go
+func Hello(name string) string {
+	return "Hello, " + name
+}
+```
+
+用 AST 构造等效结构：
+
+```go
+func buildFunc() ast.Decl {
+	return &ast.FuncDecl{
+		Name: ast.NewIdent("Hello"),
+		Type: &ast.FuncType{
+			Params: &ast.FieldList{
+				List: []*ast.Field{
+					{
+						Names: []*ast.Ident{ast.NewIdent("name")},
+						Type:  ast.NewIdent("string"),
+					},
+				},
+			},
+			Results: &ast.FieldList{
+				List: []*ast.Field{
+					{
+						Type: ast.NewIdent("string"),
+					},
+				},
+			},
+		},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.ReturnStmt{
+					Results: []ast.Expr{
+						&ast.BinaryExpr{
+							X:  &ast.BasicLit{Kind: token.STRING, Value: `"Hello, "`},
+							Op: token.ADD,
+							Y:  ast.NewIdent("name"),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+```
+
+#### 24.3.3 步骤三：组合为完整文件
+
+```go
+func buildFile() *ast.File {
+    return &ast.File{
+        Name:  ast.NewIdent("main"),
+        Decls: []ast.Decl{buildFunc()},
+    }
+}
+```
+
+#### 24.3.4 步骤四：输出生成的代码到 `.go` 文件
+
+```go
+func main() {
+    fset := token.NewFileSet()
+    f := buildFile()
+
+    file, err := os.Create("hello_gen.go")
+    if err != nil {
+        panic(err)
+    }
+    defer file.Close()
+
+    // 格式化并写入文件
+    format.Node(file, fset, f)
+}
+```
+
+运行后，会生成 `hello_gen.go`，内容类似于：
+
+<<< @/go/codes/golang/hello_gen.go
+
+### 24.4 AST 节点常见结构
+
+| AST 类型               | 描述            | 示例              |
+| -------------------- | ------------- | --------------- |
+| `*ast.File`          | 表示一个 Go 文件    | 整体文件结构          |
+| `*ast.FuncDecl`      | 表示函数声明        | `func Foo() {}` |
+| `*ast.GenDecl`       | 常量/变量/类型声明    | `var x int`     |
+| `*ast.AssignStmt`    | 赋值语句          | `x := 1`        |
+| `*ast.ReturnStmt`    | 返回语句          | `return x`      |
+| `*ast.BinaryExpr`    | 二元运算符         | `x + y`         |
+| `*ast.BasicLit`      | 字面量           | `"hello"`, `1`  |
+| `ast.NewIdent(name)` | 标识符（变量名/函数名等） | `x`, `Foo`      |
+
