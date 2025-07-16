@@ -10,11 +10,7 @@ P4-Utils 是一个可以创建和测试包含 P4 交换机的虚拟网络的 Pyt
 
 如果已经安装了所有必要的[依赖项](#依赖项)，可以使用以下命令安装 P4-Utils：
 
-```bash
-git clone https://github.com/nsg-ethz/p4-utils
-cd p4-utils
-sudo ./install.sh
-```
+<<< @/sdn/codes/p4utils/install.sh
 
 ### 依赖项
 
@@ -36,10 +32,7 @@ sudo ./install.sh
 
 ### 自动安装
 
-```bash
-wget -O install-p4-dev.sh https://raw.githubusercontent.com/nsg-ethz/p4-utils/master/install-tools/install-p4-dev.sh
-bash install-p4-dev.sh
-```
+<<< @/sdn/codes/p4utils/install_auto.sh
 
 ## 用法
 
@@ -55,17 +48,11 @@ bash install-p4-dev.sh
 
 让我们创建一个名为 `network.py` 的文件。为了定义网络，首先需要导入所需的模块并创建一个 `NetworkAPI` 对象：
 
-```python
-from p4utils.mininetlib.network_API import NetworkAPI
-
-net = NetworkAPI()
-```
+<<< @/sdn/codes/p4utils/network.py
 
 我们还可以设置脚本执行期间显示日志的详细级别：
 
-```python
-net.setLogLevel('info')
-```
+<<< @/sdn/codes/p4utils/log_level.py
 
 另一个重要的选项是涉及主机 ARP 表的设置。可以通过使用 `disableArpTables()` 和 `disableGwArp()` 方法禁用相同子网内主机及其网关的静态 ARP 条目。这些选项不适用于我们的简单示例。
 
@@ -84,13 +71,7 @@ net.setLogLevel('info')
 
 现在我们可以定义拓扑了。首先添加节点：
 
-```python
-net.addP4Switch('s1')
-net.addHost('h1')
-net.addHost('h2')
-net.addHost('h3')
-net.addHost('h4')
-```
+<<< @/sdn/codes/p4utils/node.py
 
 如上所示，我们添加了一个名为 `s1` 的 P4 交换机和四个主机 `h1`、`h2`、`h3`、`h4`。
 
@@ -100,20 +81,13 @@ net.addHost('h4')
 
 对于 P4 交换机，需要配置一个 P4 程序。假设我们有一个名为 `l2_forwarding.p4` 的 P4 程序文件，与 Python 脚本位于同一文件夹中。通过以下命令将其添加到 `s1`：
 
-```python
-net.setP4Source('s1','l2_forwarding.p4')
-```
+<<< @/sdn/codes/p4utils/p4_source.py
 
 此文件将被编译并传递给交换机。
 
 现在设置链路：
 
-```python
-net.addLink('s1', 'h1')
-net.addLink('s1', 'h2')
-net.addLink('s1', 'h3')
-net.addLink('s1', 'h4')
-```
+<<< @/sdn/codes/p4utils/link.py
 
 ::: warning 警告
 链路必须在节点添加之后设置，因为 `addLink()` 方法会检查连接的节点是否实际存在于网络中。
@@ -121,16 +95,7 @@ net.addLink('s1', 'h4')
 
 可以通过指定节点的端口号简化交换机配置：
 
-```python
-net.setIntfPort('s1', 'h1', 1)  # s1 面向 h1 的端口号
-net.setIntfPort('h1', 's1', 0)  # h1 面向 s1 的端口号
-net.setIntfPort('s1', 'h2', 2)
-net.setIntfPort('h2', 's1', 0)
-net.setIntfPort('s1', 'h3', 3)
-net.setIntfPort('h3', 's1', 0)
-net.setIntfPort('s1', 'h4', 4)
-net.setIntfPort('h4', 's1', 0)
-```
+<<< @/sdn/codes/p4utils/intf_port.py
 
 ::: tip 重要提示
 如果未指定端口号，将进行自动分配。自动分配在不同网络脚本执行中是一致的。
@@ -138,50 +103,42 @@ net.setIntfPort('h4', 's1', 0)
 
 如果要将 `s1` 和 `h1` 之间的链路带宽限制为 5 Mbps，可以使用以下方法：
 
-```python
-net.setBw('s1', 'h1', 5)
-```
+<<< @/sdn/codes/p4utils/bw.py
 
 要一次性为所有链路设置带宽：
 
-```python
-net.setBwAll(5)
-```
+<<< @/sdn/codes/p4utils/bw_all.py
 
 定义拓扑后，需要为节点分配 IP 和 MAC 地址。提供了以下三种方法：
 
 - 默认设置：如果未指定，所有节点都位于 `10.0.0.0/8` 网络中，MAC 地址随机分配。
 - 手动分配：
     - 使用 `setIntfIp()` 设置接口的 IP 地址：
-        ```python
-        net.setIntfIp('h1', 's1', '10.0.0.1/24')  # h1 面向 s1 的接口 IP 为 10.0.0.1/24
-        ```
+
+        <<< @/sdn/codes/p4utils/intf_ip.py
+
     - 使用 `setIntfMac()` 设置接口的 MAC 地址：
-        ```python
-        net.setIntfMac('h1', 's1', '00:00:00:00:00:01')  # h1 面向 s1 的接口 MAC 为 00:00:00:00:00:01
-        ```
+
+        <<< @/sdn/codes/p4utils/intf_mac.py
+
 - 预定义分配策略：
     - 使用 L2 策略：
-        ```python
-        net.l2()
-        ```
+
+        <<< @/sdn/codes/p4utils/l2.py
+
     - 使用混合策略：
-        ```python
-        net.mixed()
-        ```
+
+        <<< @/sdn/codes/p4utils/mixed.py
+
     - 使用 L3 策略：
-        ```python
-        net.l3()
-        ```
+
+        <<< @/sdn/codes/p4utils/l3.py
 
 在本例中，主机位于同一网络，因此可以使用 L2 策略。
 
 可以启用 `.pcap` 文件记录和日志记录：
 
-```python
-net.enablePcapDumpAll()
-net.enableLogAll()
-```
+<<< @/sdn/codes/p4utils/pcap.py
 
 ::: warning 注意
 也可以使用 `enablePcapDump()` 和 `enableLog()` 为特定交换机启用这些功能。
@@ -189,16 +146,11 @@ net.enableLogAll()
 
 最后，我们可以启用网络客户端并启动网络：
 
-```python
-net.enableCli()
-net.startNetwork()
-```
+<<< @/sdn/codes/p4utils/start.py
 
 要执行网络，只需以超级用户权限运行我们的 Python 脚本：
 
-```python
-sudo python3 network.py
-```
+<<< @/sdn/codes/p4utils/start.sh
 
 ### 自动分配策略
 
@@ -245,15 +197,11 @@ sudo python3 network.py
 
 例如，如果想快速检查所有主机之间的连通性，可以使用以下命令：
 
-```bash
-mininet> pingall
-```
+<<< @/sdn/codes/p4utils/pingall.sh
 
 还可以通过以下命令获取命令的摘要：
 
-```bash
-mininet> ?
-```
+<<< @/sdn/codes/p4utils/help.sh
 
 ### 控制平面配置
 
@@ -269,17 +217,11 @@ _Thrift_ 端口号可以在网络配置中显式分配。如果未为网络中�
 
 启动网络后，可以执行以下命令连接到客户端：
 
-```bash
-simple_switch_CLI --thrift-port 9090 --thrift-ip 127.0.0.1
-```
+<<< @/sdn/codes/p4utils/thrift.sh
 
 以下选项可以传递给 `simple_switch_CLI`：
 
-```bash
-simple_switch_CLI [-h] [--thrift-port THRIFT_PORT]
-                       [--thrift-ip THRIFT_IP] [--json JSON]
-                       [--pre {None,SimplePre,SimplePreLAG}]
-```
+<<< @/sdn/codes/p4utils/thrift_opt.sh
 
 ::: tip 重要提示
 如果未指定，`simple_switch_CLI` 命令会假设 IP 为 `127.0.0.1`，端口为 `9090`。P4-Utils 始终将 IP `127.0.0.1` 分配给所有 _Thrift_ 服务器，因此唯一变化的是每个交换机监听的端口。
@@ -287,24 +229,15 @@ simple_switch_CLI [-h] [--thrift-port THRIFT_PORT]
 
 可以通过以下命令获取所有可用命令列表：
 
-```bash
-RuntimeCmd: ?
-```
+<<< @/sdn/codes/p4utils/thrift_question.sh
 
 要检查特定命令的语法，可以使用以下方式：
 
-```bash
-RuntimeCmd: help <command>
-```
+<<< @/sdn/codes/p4utils/thrift_help.sh
 
 假设我们要填充示例中交换机 `s1` 的转发表，可以运行以下命令：
 
-```bash
-RuntimeCmd: table_add dmac forward 00:00:0a:00:00:01 => 1
-RuntimeCmd: table_add dmac forward 00:00:0a:00:00:02 => 2
-RuntimeCmd: table_add dmac forward 00:00:0a:00:00:03 => 3
-RuntimeCmd: table_add dmac forward 00:00:0a:00:00:04 => 4
-```
+<<< @/sdn/codes/p4utils/cmd_table_add.sh
 
 每条命令会向表中添加一个匹配项，例如：
 
@@ -331,9 +264,7 @@ table_add dmac forward 00:00:0a:00:00:04 => 4
 
 在 Python 网络配置脚本中添加以下行，将该命令文件传递给 P4-Utils（假设脚本和命令文件在同一文件夹中）：
 
-```python
-net.setP4CliInput('s1', 's1-commands.txt')
-```
+<<< @/sdn/codes/p4utils/cli_input.py
 
 如果使用 JSON 网络配置文件，可以通过修改 `topology` 字段中的交换机 `s1` 来指定 _Thrift_ 命令文件：
 
@@ -361,15 +292,11 @@ _Thrift API_ 可以用于所有 P4 交换机，基于 _Thrift_ 命令行客户�
 
 开始使用，我们创建一个新的 Python 脚本，命名为 `controller.py`，并导入用于配置 P4 交换机的模块：
 
-```python
-from p4utils.utils.sswitch_thrift_API import SimpleSwitchThriftAPI
-```
+<<< @/sdn/codes/p4utils/thrift.py
 
 我们还需要与运行在交换机上的服务器建立连接。我们知道 `s1` 的 _Thrift_ 服务器监听地址为 `127.0.0.1:9090`（见[相关说明](#thrift-客户端)），因此可以通过以下方式连接：
 
-```python
-controller = SimpleSwitchThriftAPI(9090)
-```
+<<< @/sdn/codes/p4utils/thrift_conn.py
 
 ::: warning 注意
 `SimpleSwitchThriftAPI` 默认假设 _Thrift_ 服务器的 IP 地址为 `127.0.0.1`。
@@ -377,18 +304,11 @@ controller = SimpleSwitchThriftAPI(9090)
 
 现在，我们可以使用控制器设置转发规则。调用 `table_add()` 方法：
 
-```python
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:01'], ['1'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:02'], ['2'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:03'], ['3'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:04'], ['4'])
-```
+<<< @/sdn/codes/p4utils/table_add.py
 
 在网络启动后，可以运行控制器脚本来填充 `s1` 的转发表：
 
-```bash
-python3 controller.py
-```
+<<< @/sdn/codes/p4utils/controller.sh
 
 #### P4Runtime API
 
@@ -400,13 +320,7 @@ _P4Runtime API_ 由 `SimpleSwitchP4RuntimeAPI` 实现，仅适用于支持 P4Run
 
 假设我们已正确启用了 P4Runtime，可以为交换机 `s1` 编写 Python P4Runtime 控制器脚本（`controller.py`）：
 
-```python
-from p4utils.utils.sswitch_p4runtime_API import SimpleSwitchP4RuntimeAPI
-
-controller = SimpleSwitchP4RuntimeAPI(device_id=1, grpc_port=9559,
-                                      p4rt_path='l2_forwarding_p4rt.txt',
-                                      json_path='l2_forwarding.json')
-```
+<<< @/sdn/codes/p4utils/p4runtime.py
 
 ::: tip 重要提示
 P4Info 文件 `l2_forwarding_p4rt.txt` 和 P4 编译后的 JSON 文件 `l2_forwarding.json` 都是由 P4 编译器生成的。
@@ -423,32 +337,21 @@ P4Info 文件 `l2_forwarding_p4rt.txt` 和 P4 编译后的 JSON 文件 `l2_forwa
 
 现在， 我们可以使用控制器设置转发规则，调用 `table_add()` 方法：
 
-```python
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:01'], ['1'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:02'], ['2'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:03'], ['3'])
-controller.table_add('dmac', 'forward', ['00:00:0a:00:00:04'], ['4'])
-```
+<<< @/sdn/codes/p4utils/table_add.py
 
 在网络启动后，可以运行控制器脚本来填充 `s1` 的转发表：
 
-```bash
-python3 controller.py
-```
+<<< @/sdn/codes/p4utils/controller.sh
 
 ##### 使用 Python 启用 P4Runtime
 
 针对我们的简单示例，P4 编译器需要知道我们正在使用 P4Runtime 交换机，以生成连接到交换机的 P4Runtime 服务器所需的 P4Info 文件。
 
-```python
-net.setCompiler(p4rt=True)
-```
+<<< @/sdn/codes/p4utils/p4rt.py
 
 接下来，需要指定正在使用 P4Runtime 交换机。在 Python 网络配置脚本中，可以通过以下方式实现：
 
-```python
-net.addP4RuntimeSwitch('s1')
-```
+<<< @/sdn/codes/p4utils/p4sw.py
 
 ##### 使用 JSON 启用 P4Runtime
 
@@ -498,32 +401,7 @@ net.addP4RuntimeSwitch('s1')
 
 以我们简单的拓扑示例为例，可以在无需了解交换机任何详细信息的情况下，自动配置转发表：
 
-```python
-from p4utils.utils.helper import load_topo
-from p4utils.utils.sswitch_p4runtime_API import SimpleSwitchP4RuntimeAPI
-
-# 加载拓扑文件
-topo = load_topo('topology.json')
-
-# 初始化控制器
-controller = SimpleSwitchP4RuntimeAPI(
-    topo['s1']['device_id'],
-    topo['s1']['grpc_port'],
-    p4rt_path=topo['s1']['p4rt_path'],
-    json_path=topo['s1']['json_path']
-)
-
-# 遍历 s1 的所有邻居节点
-for neigh in topo.get_neighbors('s1'):
-    if topo.isHost(neigh):
-        # 添加转发表项
-        controller.table_add(
-            'dmac',
-            'forward',
-            [topo.get_host_mac(neigh)],
-            [str(topo.node_to_node_port_num('s1', neigh))]
-        )
-```
+<<< @/sdn/codes/p4utils/topo.py
 
 ### 任务调度器
 
@@ -538,9 +416,7 @@ for neigh in topo.get_neighbors('s1'):
 
 在网络启动后，可以在网络客户端中使用以下命令调度任务：
 
-```bash
-mininet> task <node> <start> <duration> <exe> [<arg1>] ... [<argN>] [--mod <module>] [--<key1> <kwarg1>] ... [--<keyM> <kwargM>]
-```
+<<< @/sdn/codes/p4utils/task.sh
 
 参数说明：
 
@@ -557,9 +433,7 @@ mininet> task <node> <start> <duration> <exe> [<arg1>] ... [<argN>] [--mod <modu
 
 假设我们使用简单的网络拓扑，让 `h1` 对 `h2` 进行 10 秒的 ping，可以在客户端中输入以下命令：
 
-```bash
-mininet> task h1 0 10 "ping 10.0.0.2"
-```
+<<< @/sdn/codes/p4utils/task_ping.sh
 
 #### 使用文件调度任务
 
@@ -587,9 +461,7 @@ h3 10 30 "ping 10.0.0.4"
 
 如果使用的是 Python 网络配置脚本，可以通过添加以下代码来实现：
 
-```python
-net.addTaskFile('tasks.txt')
-```
+<<< @/sdn/codes/p4utils/task.py
 
 如果使用的是 JSON 配置文件，可以在主字典中添加以下键值对（例如，可以将其放在 `p4_src` 选项之后）：
 

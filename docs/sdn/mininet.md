@@ -254,35 +254,7 @@ mininet> exit
 
 使用简单的 Python API 也可以轻松定义自定义拓扑。在如下示例中，两个交换机直接连接，每个交换机连接一个主机：
 
-```py
-"""自定义拓扑示例
-
-两个直接连接的交换机，每个交换机连接一个主机：
-
-   主机 --- 交换机 --- 交换机 --- 主机
-
-添加一个包含键值对的 'topos' 字典来生成新定义的拓扑，使得可以从命令行传入 '--topo=mytopo' 来调用该拓扑。
-"""
-
-from mininet.topo import Topo
-
-class MyTopo( Topo ):
-
-    def build( self ):
-        # 新增主机和交换机
-        leftHost = self.addHost( 'h1' )
-        rightHost = self.addHost( 'h2' )
-        leftSwitch = self.addSwitch( 's3' )
-        rightSwitch = self.addSwitch( 's4' )
-
-        # 增加链路
-        self.addLink( leftHost, leftSwitch )
-        self.addLink( leftSwitch, rightSwitch )
-        self.addLink( rightSwitch, rightHost )
-
-
-topos = { 'mytopo': ( lambda: MyTopo() ) }
-```
+<<< @/sdn/codes/mn/topo.py
 
 提供自定义 Mininet 文件时，可以向命令行添加新的拓扑、交换机类型和测试。例如：
 
@@ -437,27 +409,7 @@ mininet/util/install.sh -n
 
 在两个主机间进行 `iperf udp` 测试，并在 server 端记录，实现该功能的 `iperfSingle` 函数写在 `Mininet` 类下，代码如下：
 
-```python
-class Mininet(object):
-    ...  # 原始代码
-
-    def iperf_single(self, hosts=None, udp_bw='10M', period=60):
-        if not hosts:
-            return
-        assert len(hosts) == 2
-        client, server = hosts
-        filename = client.name[1:] + '.out'
-        output(f'*** iperf: testing bandwidth between {client.name} and {server.name}\n')
-        iperf_args = 'iperf -u'
-        bw_args = f'-b {udp_bw}'
-
-        print('*** Start server')
-        server.cmd(f'{iperf_args} -s -i 1 > ~/mn_log/{filename}&')
-
-        print('*** Start client')
-        client.cmd(f'{iperf_args} -t {period} -c {server.IP()} {bw_args} > ~/mn_log/client{filename}&')
-
-```
+<<< @/sdn/codes/mn/iperf.py
 
 ### 2 `mininet/net.py` 中定义 `iperfMulti` 函数
 
@@ -465,47 +417,13 @@ class Mininet(object):
 
 代码编写在 `iperfSingle` 之后：
 
-```python
-import random
-
-
-class Mininet(object):
-    ...  # 原始代码
-
-    def iperfSingle(self, hosts=None, udp_bw='10M', period=60):
-        ...  # 前面实现的方法
-
-    def iperfMulti(self, bw, period=60):
-        for client in self.hosts:
-            server = client
-            while server == client:
-                server = random.choice(self.hosts)
-            self.iperfSingle(hosts=[client, server], udp_bw=bw, period=period)
-            sleep(0.05)
-
-        sleep(period)
-        print('test has done')
-```
+<<< @/sdn/codes/mn/net.py
 
 ### 3 `mininet/cli.py` 中注册 `iperfmulti` 命令
 
 解析用户输入命令，`net.py` 定义的 `iperf_multi` 函数需要在 `CLI` 类中注册成命令：
 
-```python
-class CLI(Cmd):
-    ...  # 原始代码
-
-    def do_iperfmulti(self, line):
-        """Multi iperf UDP test between nodes"""
-        args = line.split()
-        if len(args) == 1:
-            self.mn.iperfMulti(args[0])
-        elif len(args) == 2:
-            self.mn.iperfMulti(args[0], float(args[1]))
-        else:
-            error('invalid number of args: iperfMulti udpBw period\n' +
-                  'udpBw examples:1M 120\n')
-```
+<<< @/sdn/codes/mn/cli.py
 
 ### 4 `bin/mn` 中加入 `iperf-multi` 命令
 

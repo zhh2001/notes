@@ -8,17 +8,7 @@ Go 协程是由 Go 运行时管理的轻量级线程。它们允许在单个进�
 
 ## 1 创建协程
 
-```go
-func sayHello() {
-    fmt.Println("Hello from goroutine!")
-}
-
-func main() {
-    go sayHello()  // 启动一个新的协程
-    fmt.Println("Hello from main!")
-    time.Sleep(1 * time.Second)  // 等待协程完成
-}
-```
+<<< @/go/codes/goroutine/hello.go
 
 输出结果可能是：
 
@@ -130,27 +120,7 @@ func example() {
 
 完整示例：
 
-```go
-var counter int
-var mu sync.Mutex
-var wg = sync.WaitGroup{}
-
-func count() {
-    mu.Lock()
-    defer mu.Unlock()
-    defer wg.Done()
-    counter++
-}
-
-func main() {
-    for i := 0; i < 1000000; i++ {
-        wg.Add(1)
-        go count()
-    }
-    wg.Wait()
-    fmt.Println(counter)
-}
-```
+<<< @/go/codes/goroutine/mu.go
 
 ## 5 原子操作包
 
@@ -286,27 +256,7 @@ for v := range ch {
 
 `select` 语句允许同时等待多个 Channel 操作，类似于 `switch` 语句，但用于 Channel。
 
-```go
-ch1 := make(chan string)
-ch2 := make(chan string)
-
-go func() {
-    time.Sleep(1 * time.Second)
-    ch1 <- "ch1"
-}()
-
-go func() {
-    time.Sleep(2 * time.Second)
-    ch2 <- "ch2"
-}()
-
-select {
-case msg1 := <-ch1:
-    fmt.Println(msg1)
-case msg2 := <-ch2:
-    fmt.Println(msg2)
-}
-```
+<<< @/go/codes/goroutine/select.go
 
 当多个 `case` 同时就绪时，`select` 会随机选择一个执行。这有助于避免某些 Goroutine 被饿死（即一直得不到执行机会）。
 
@@ -378,14 +328,7 @@ func main() {
 
 ### 8.1 核心接口
 
-```go
-type Context interface {
-    Deadline() (deadline time.Time, ok bool)  // 返回上下文的截止时间
-    Done() <-chan struct{}                    // 返回一个通道，当上下文被取消或到达截止时间时关闭
-    Err() error                               // 返回上下文被取消的原因
-    Value(key interface{}) interface{}        // 返回与 key 关联的值，如果没有则返回 nil
-}
-```
+<<< @/go/codes/goroutine/context.go
 
 ### 8.2 创建根上下文
 
