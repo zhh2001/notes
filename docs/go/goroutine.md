@@ -57,37 +57,25 @@ GMP 调度器是 Go 语言实现高效并发的关键组件。它通过将 gorou
 
 1. **创建一个 `WaitGroup`**
 
-```go
-var wg sync.WaitGroup
-```
+<<< @/go/codes/goroutine/wg.go
 
 2. **添加等待的 goroutine 数量**
 
 使用 `Add` 方法来设置需要等待的 goroutine 数量。这通常在启动 goroutine 之前调用。
 
-```go
-wg.Add(3)  // 表示需要等待 3 个 goroutine 完成
-```
+<<< @/go/codes/goroutine/add.go
 
 3. **在每个 goroutine 完成时调用 `Done`**
 
 在每个 goroutine 的逻辑结束时，调用 `Done` 方法来通知 `WaitGroup` 该 goroutine 已完成。通常使用 `defer` 语句确保 `Done` 被调用。
 
-```go
-go func() {
-    defer wg.Done()
-    // goroutine 的逻辑代码
-}()
-```
+<<< @/go/codes/goroutine/done.go
 
 4. **等待所有 goroutine 完成**
 
 在主 goroutine 中调用 `Wait` 方法，它会阻塞直到所有的 goroutine 调用了 `Done`。
 
-```go
-wg.Wait()
-fmt.Println("All Done")
-```
+<<< @/go/codes/goroutine/wait.go
 
 ## 4 互斥锁
 
@@ -97,26 +85,15 @@ Go 的 `sync` 包提供了 `Mutex` 类型，用于实现互斥锁。以下是互
 
 首先，需要导入 `sync` 包：
 
-```go
-import "sync"
-```
+<<< @/go/codes/goroutine/sync.go
 
 定义一个 `sync.Mutex` 变量：
 
-```go
-var mu sync.Mutex
-```
+<<< @/go/codes/goroutine/mutex.go
 
 使用 `Lock()` 方法对互斥锁进行加锁，使用 `Unlock()` 方法进行解锁。通常，`Unlock()` 会在 `defer` 语句中调用，以确保在函数退出时释放锁。
 
-```go{2,3}
-func example() {
-    mu.Lock()
-    defer mu.Unlock()
-
-    // 访问共享资源
-}
-```
+<<< @/go/codes/goroutine/lock.go{2,3}
 
 完整示例：
 
@@ -130,43 +107,23 @@ func example() {
 
 1. `Add`：原子地将 `delta` 添加到 `*addr` 并返回新值。
 
-```go
-var ops uint64 = 0
-atomic.AddUint64(&ops, 1)
-fmt.Println("ops:", ops)
-```
+<<< @/go/codes/goroutine/atomic_add.go
 
 2. `CompareAndSwap`：原子地比较 `addr` 的旧值和 `old`。如果相等，则将 `addr` 的值设为新值并返回 `true`；否则返回 `false`。
 
-```go
-var value int32 = 3
-swapped := atomic.CompareAndSwapInt32(&value, 3, 5)
-fmt.Println(swapped, value)  // true, 5
-```
+<<< @/go/codes/goroutine/atomic_swap.go
 
 3. `Load`：原子地加载 `*addr`。
 
-```go
-var value int32 = 18
-loadedValue := atomic.LoadInt32(&value)
-fmt.Println(loadedValue)  // 18
-```
+<<< @/go/codes/goroutine/atomic_load.go
 
 4. `Store`：原子地存储 `val` 到 `*addr`。
 
-```go
-var value int32 = 0
-atomic.StoreInt32(&value, 20)
-fmt.Println(value)  // 20
-```
+<<< @/go/codes/goroutine/atomic_store.go
 
 5. `Swap`：原子地将 `val` 存储到 `*addr` 并返回 `*addr` 的旧值。
 
-```go
-var value int32 = 4
-oldValue := atomic.SwapInt32(&value, 5)
-fmt.Println(oldValue, value)  // 4, 5
-```
+<<< @/go/codes/goroutine/atomic_swap_int.go
 
 原子操作在并发编程中非常有用，因为它们可以避免使用锁，从而减少性能开销和死锁的风险。然而，需要注意的是，并非所有操作都可以通过原子操作来实现。对于复杂的操作，仍然需要使用互斥锁（`sync.Mutex`）或其他同步机制来确保数据的一致性。
 
@@ -201,56 +158,25 @@ fmt.Println(oldValue, value)  // 4, 5
 
 ### 7.1 创建
 
-```go
-ch := make(chan int)  // 创建一个传递 int 类型的无缓冲 Channel
-chBuffered := make(chan int, 10)  // 创建一个传递 int 类型的有缓冲 Channel，缓冲区大小为 10
-```
+<<< @/go/codes/goroutine/chan.go
 
 ### 7.2 无缓冲
 
 无缓冲 Channel 在发送和接收操作完成之前会阻塞。
 
-```go
-ch := make(chan string)
-
-go func() {
-    time.Sleep(2 * time.Second)
-    ch <- "Zhang"
-}()
-
-msg := <-ch
-fmt.Println(msg)
-```
+<<< @/go/codes/goroutine/chan2.go
 
 ### 7.3 有缓冲
 
 有缓冲 Channel 允许在阻塞之前存储一定数量的元素。
 
-```go
-ch := make(chan int, 2)
-
-ch <- 1
-ch <- 2
-// ch <- 3  // 如果取消注释，这里会阻塞，因为缓冲区已满
-
-fmt.Println(<-ch)  // 输出 1
-fmt.Println(<-ch)  // 输出 2
-```
+<<< @/go/codes/goroutine/chan3.go
 
 ### 7.4 关闭
 
 关闭 Channel 表示不会再有更多的值发送到该 Channel。接收方可以通过检测 Channel 是否关闭来决定如何处理接收到的数据。
 
-```go
-ch := make(chan int, 2)
-ch <- 1
-ch <- 2
-close(ch)
-
-for v := range ch {
-    fmt.Println(v)
-}
-```
+<<< @/go/codes/goroutine/chan4.go
 
 ### 7.5 多路复用（Select）
 
@@ -262,17 +188,7 @@ for v := range ch {
 
 通常还会设置一个超时时间，避免阻塞等待的时间过长：
 
-```go
-timer := time.NewTimer(3 * time.Second)  // 会在 3s 后向 Channel timer.C 写入时间
-select {
-case msg1 := <-ch1:
-    fmt.Println(msg1)
-case msg2 := <-ch2:
-    fmt.Println(msg2)
-case <-timer.C:
-    fmt.Println("Timed out")
-}
-```
+<<< @/go/codes/goroutine/timer.go
 
 ### 7.6 单向 Channel
 
@@ -283,38 +199,11 @@ case <-timer.C:
 
 首先，需要创建一个双向 Channel，然后可以将其转换为单向 Channel：
 
-```go
-ch := make(chan int)  // 创建一个双向的整数通道
-var sendOnly chan<- int = ch  // sendOnly 只能用于发送数据
-var receiveOnly <-chan int = ch  // receiveOnly 只能用于接收数据
-```
+<<< @/go/codes/goroutine/chan_only.go
 
-单向Channel常用于函数参数，以确保函数只能以特定的方式使用通道：
+单向 Channel 常用于函数参数，以确保函数只能以特定的方式使用通道：
 
-```go
-// 生产者函数，只发送数据
-func producer(sendCh chan<- int) {
-	for i := 0; i < 5; i++ {
-		sendCh <- i
-		fmt.Println("Produced:", i)
-	}
-	close(sendCh)
-}
-
-// 消费者函数，只接收数据
-func consumer(receiveCh <-chan int) {
-	for num := range receiveCh {
-		fmt.Println("Consumed:", num)
-	}
-}
-
-func main() {
-	ch := make(chan int)
-
-	go producer(ch)
-	consumer(ch)
-}
-```
+<<< @/go/codes/goroutine/chan_only_example.go
 
 ## 8 context
 
@@ -334,9 +223,7 @@ func main() {
 
 根上下文是一个没有任何值、不会被取消且没有截止时间的上下文，通常作为其他上下文的父级使用。
 
-```go
-ctx := context.Background()
-```
+<<< @/go/codes/goroutine/bg.go
 
 ### 8.3 派生上下文
 
@@ -344,28 +231,16 @@ ctx := context.Background()
 
 带取消功能的上下文：
 
-```go
-ctx, cancel := context.WithCancel(context.Background())
-defer cancel()  // 确保在不需要时取消上下文，释放资源
-```
+<<< @/go/codes/goroutine/with_cancel.go
 
 带截止时间的上下文：
 
-```go
-deadline := time.Now().Add(10 * time.Second)
-ctx, cancel := context.WithDeadline(context.Background(), deadline)
-defer cancel()
-```
+<<< @/go/codes/goroutine/with_deadline.go
 
 或者使用 `WithTimeout` 简化：
 
-```go
-ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
-defer cancel()
-```
+<<< @/go/codes/goroutine/with_timeout.go
 
 带值的上下文：
 
-```go
-ctx := context.WithValue(context.Background(), "userID", 12345)
-```
+<<< @/go/codes/goroutine/with_val.go
