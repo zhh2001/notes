@@ -39,9 +39,7 @@ TTL（Time to Live）是IP数据包头中的一个字段，用于限制数据包
 
 1. 在命令行执行：
 
-```shell
-make run
-```
+<<< @/sdn/codes/p4exercise/make_run.sh
 
 这将会：
 
@@ -51,22 +49,15 @@ make run
 
 2. 现在，我们能看到 Mininet 命令提示符。尝试在拓扑中的主机间进行 `ping` 操作：
 
-```shell
-mininet> h1 ping h2
-mininet> pingall
-```
+<<< @/sdn/codes/p4exercise/mn_ping.sh
 
 3. 输入 `exit` 退出 Mininet 命令行。然后停止 Mininet：
 
-```shell
-make stop
-```
+<<< @/sdn/codes/p4exercise/make_stop.sh
 
 4. 删除所有的 pcap、构建文件和日志：
 
-```shell
-make clean
-```
+<<< @/sdn/codes/p4exercise/make_clean.sh
 
 `ping` 不通是因为我们还没有完成转发功能，所有数据包都被丢弃了。
 
@@ -105,12 +96,7 @@ L3 是 Layer 3 的简称，属于 OSI 模型中的一个层级，为网络层。
 
 #### 1.4.1 文件头部
 
-```p4
-#include <core.p4>
-#include <v1model.p4>
-
-const bit<16> TYPE_IPV4 = 0x800;
-```
+<<< @/sdn/codes/p4exercise/basic_1.p4
 
 首先引入了 P4 核心库和 V1 模型，随后定义了一个值为 `0x800` 常量 `TYPE_IPV4` 用于指示 IPv4 协议的数据包类型。
 
@@ -123,41 +109,7 @@ const bit<16> TYPE_IPV4 = 0x800;
 
 #### 1.4.2 报头部分
 
-```p4
-typedef bit<9>  egressSpec_t;
-typedef bit<48> macAddr_t;
-typedef bit<32> ip4Addr_t;
-
-header ethernet_t {
-    macAddr_t dstAddr;
-    macAddr_t srcAddr;
-    bit<16>   etherType;
-}
-
-header ipv4_t {
-    bit<4>    version;
-    bit<4>    ihl;
-    bit<8>    diffserv;
-    bit<16>   totalLen;
-    bit<16>   identification;
-    bit<3>    flags;
-    bit<13>   fragOffset;
-    bit<8>    ttl;
-    bit<8>    protocol;
-    bit<16>   hdrChecksum;
-    ip4Addr_t srcAddr;
-    ip4Addr_t dstAddr;
-}
-
-struct metadata {
-    /* empty */
-}
-
-struct headers {
-    ethernet_t   ethernet;
-    ipv4_t       ipv4;
-}
-```
+<<< @/sdn/codes/p4exercise/basic_2.p4
 
 定义了以下结构：
 
@@ -174,86 +126,21 @@ struct headers {
 
 #### 1.4.3 解析器部分
 
-```p4{7}
-parser MyParser(packet_in packet,
-                out headers hdr,
-                inout metadata meta,
-                inout standard_metadata_t standard_metadata) {
-
-    state start {
-        /* TODO: add parser logic */
-        transition accept;
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_3.p4{7}
 
 此处包含需要完善的逻辑，需要从数据包中提取出以太网报头和 IPv4 报头。使用以下代码替换 `TODO` 部分：
 
-```p4
-state start {
-    packet.extract(hdr.ethernet);
-    packet.extract(hdr.ipv4);
-    transition accept;
-}
-```
+<<< @/sdn/codes/p4exercise/basic_4.p4
 
 #### 1.4.4 验证校验和部分
 
-```p4
-control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
-    apply {  }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_5.p4
 
 用于计算校验和，以确保数据包在传输过程中未被损坏。
 
 #### 1.4.5 Ingress部分
 
-```p4{19,20,38,39,40}
-control MyIngress(inout headers hdr,
-                  inout metadata meta,
-                  inout standard_metadata_t standard_metadata) {
-    action drop() {
-        mark_to_drop(standard_metadata);
-    }
-
-    action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-        /*
-            Action function for forwarding IPv4 packets.
-
-            This function is responsible for forwarding IPv4 packets to the specified
-            destination MAC address and egress port.
-
-            Parameters:
-            - dstAddr: Destination MAC address of the packet.
-            - port: Egress port where the packet should be forwarded.
-
-            TODO: Implement the logic for forwarding the IPv4 packet based on the
-            destination MAC address and egress port.
-        */
-    }
-
-    table ipv4_lpm {
-        key = {
-            hdr.ipv4.dstAddr: lpm;
-        }
-        actions = {
-            ipv4_forward;
-            drop;
-            NoAction;
-        }
-        size = 1024;
-        default_action = NoAction();
-    }
-
-    apply {
-        /* TODO: fix ingress control logic
-         *  - ipv4_lpm should be applied only when IPv4 header is valid
-         */
-        ipv4_lpm.apply();
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_6.p4{19,20,38,39,40}
 
 此处包含两个 `TODO` 待完成。先看看代码：
 
@@ -264,95 +151,31 @@ control MyIngress(inout headers hdr,
 
 完成第一个 `TODO` 部分：
 
-```p4{2-5}
-action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-    standard_metadata.egress_spec = port;
-    hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
-    hdr.ethernet.dstAddr = dstAddr;
-    hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
-}
-```
+<<< @/sdn/codes/p4exercise/basic_7.p4
 
 完成第二个 `TODO` 部分：
 
-```p4
-apply {
-    if (hdr.ipv4.isValid()) {
-        ipv4_lpm.apply();
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_8.p4
 
 #### 1.4.6 Egress部分
 
-```p4
-control MyEgress(inout headers hdr,
-                 inout metadata meta,
-                 inout standard_metadata_t standard_metadata) {
-    apply {  }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_9.p4
 
 Egress 的作用是执行在数据包即将离开设备时的处理逻辑。
 
 #### 1.4.7 计算校验和部分
 
-```p4
-control MyComputeChecksum(inout headers hdr, inout metadata meta) {
-     apply {
-        update_checksum(
-            hdr.ipv4.isValid(),
-            { hdr.ipv4.version,
-              hdr.ipv4.ihl,
-              hdr.ipv4.diffserv,
-              hdr.ipv4.totalLen,
-              hdr.ipv4.identification,
-              hdr.ipv4.flags,
-              hdr.ipv4.fragOffset,
-              hdr.ipv4.ttl,
-              hdr.ipv4.protocol,
-              hdr.ipv4.srcAddr,
-              hdr.ipv4.dstAddr },
-            hdr.ipv4.hdrChecksum,
-            HashAlgorithm.csum16);
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_10.p4
 
 用于计算和更新IPv4头部的校验和。
 
 #### 1.4.8 反解析器部分
 
-```p4{13,14}
-control MyDeparser(packet_out packet, in headers hdr) {
-    apply {
-        /*
-        Control function for deparser.
-
-        This function is responsible for constructing the output packet by appending
-        headers to it based on the input headers.
-
-        Parameters:
-        - packet: Output packet to be constructed.
-        - hdr: Input headers to be added to the output packet.
-
-        TODO: Implement the logic for constructing the output packet by appending
-        headers based on the input headers.
-        */
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_11.p4{13,14}
 
 主要用于构建输出数据包。补全 `TODO` 部分，将以太网报头和 IPv4 报头添加到输出数据包：
 
-```p4{3,4}
-control MyDeparser(packet_out packet, in headers hdr) {
-    apply {
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.ipv4);
-    }
-}
-```
+<<< @/sdn/codes/p4exercise/basic_12.p4
 
 ### 1.5 步骤四：验证代码
 
@@ -362,139 +185,7 @@ control MyDeparser(packet_out packet, in headers hdr) {
 
 完整代码如下：
 
-```p4
-#include <core.p4>
-#include <v1model.p4>
-
-const bit<16> TYPE_IPV4 = 0x800;
-
-typedef bit<9>  egressSpec_t;
-typedef bit<48> macAddr_t;
-typedef bit<32> ip4Addr_t;
-
-header ethernet_t {
-    macAddr_t dstAddr;
-    macAddr_t srcAddr;
-    bit<16>   etherType;
-}
-
-header ipv4_t {
-    bit<4>    version;
-    bit<4>    ihl;
-    bit<8>    diffserv;
-    bit<16>   totalLen;
-    bit<16>   identification;
-    bit<3>    flags;
-    bit<13>   fragOffset;
-    bit<8>    ttl;
-    bit<8>    protocol;
-    bit<16>   hdrChecksum;
-    ip4Addr_t srcAddr;
-    ip4Addr_t dstAddr;
-}
-
-struct metadata {}
-struct headers {
-    ethernet_t   ethernet;
-    ipv4_t       ipv4;
-}
-
-parser MyParser(packet_in packet,
-                out headers hdr,
-                inout metadata meta,
-                inout standard_metadata_t standard_metadata) {
-
-    state start {
-        packet.extract(hdr.ethernet);
-        packet.extract(hdr.ipv4);
-        transition accept;
-    }
-
-}
-
-control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
-    apply {}
-}
-
-control MyIngress(inout headers hdr,
-                  inout metadata meta,
-                  inout standard_metadata_t standard_metadata) {
-    action drop() {
-        mark_to_drop(standard_metadata);
-    }
-
-    action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-        standard_metadata.egress_spec = port;
-        hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
-        hdr.ethernet.dstAddr = dstAddr;
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
-    }
-
-    table ipv4_lpm {
-        key = {
-            hdr.ipv4.dstAddr: lpm;
-        }
-        actions = {
-            ipv4_forward;
-            drop;
-            NoAction;
-        }
-        size = 1024;
-        default_action = NoAction();
-    }
-
-    apply {
-        if (hdr.ipv4.isValid()) {
-            ipv4_lpm.apply();
-        }
-    }
-}
-
-control MyEgress(inout headers hdr,
-                 inout metadata meta,
-                 inout standard_metadata_t standard_metadata) {
-    apply {}
-}
-
-control MyComputeChecksum(inout headers hdr, inout metadata meta) {
-     apply {
-        update_checksum(
-            hdr.ipv4.isValid(),
-            {
-                hdr.ipv4.version,
-                hdr.ipv4.ihl,
-                hdr.ipv4.diffserv,
-                hdr.ipv4.totalLen,
-                hdr.ipv4.identification,
-                hdr.ipv4.flags,
-                hdr.ipv4.fragOffset,
-                hdr.ipv4.ttl,
-                hdr.ipv4.protocol,
-                hdr.ipv4.srcAddr,
-                hdr.ipv4.dstAddr
-            },
-            hdr.ipv4.hdrChecksum,
-            HashAlgorithm.csum16
-        );
-    }
-}
-
-control MyDeparser(packet_out packet, in headers hdr) {
-    apply {
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.ipv4);
-    }
-}
-
-V1Switch(
-    MyParser(),
-    MyVerifyChecksum(),
-    MyIngress(),
-    MyEgress(),
-    MyComputeChecksum(),
-    MyDeparser()
-) main;
-```
+<<< @/sdn/codes/p4exercise/basic.p4
 
 ## 2 练习二：基础隧道
 
@@ -538,9 +229,7 @@ V1Switch(
 
 1. 运行命令：
 
-```shell
-make run
-```
+<<< @/sdn/codes/p4exercise/make_run.sh
 
 这将会：
 
@@ -590,187 +279,7 @@ mininet> xterm h1 h2
 
 ### 2.4 完整代码
 
-```p4
-#include <core.p4>
-#include <v1model.p4>
-
-const bit<16> TYPE_MYTUNNEL = 0x1212;
-const bit<16> TYPE_IPV4     = 0x0800;
-
-typedef bit<9>  egressSpec_t;
-typedef bit<48> macAddr_t;
-typedef bit<32> ip4Addr_t;
-
-header ethernet_t {
-    macAddr_t dstAddr;
-    macAddr_t srcAddr;
-    bit<16>   etherType;
-}
-
-header myTunnel_t {
-    bit<16> proto_id;
-    bit<16> dst_id;
-}
-
-header ipv4_t {
-    bit<4>    version;
-    bit<4>    ihl;
-    bit<8>    diffserv;
-    bit<16>   totalLen;
-    bit<16>   identification;
-    bit<3>    flags;
-    bit<13>   fragOffset;
-    bit<8>    ttl;
-    bit<8>    protocol;
-    bit<16>   hdrChecksum;
-    ip4Addr_t srcAddr;
-    ip4Addr_t dstAddr;
-}
-
-struct metadata {}
-struct headers {
-    ethernet_t   ethernet;
-    myTunnel_t   myTunnel;
-    ipv4_t       ipv4;
-}
-
-parser MyParser(packet_in packet,
-                out headers hdr,
-                inout metadata meta,
-                inout standard_metadata_t standard_metadata) {
-
-    state start {
-        transition parse_ethernet;
-    }
-
-    state parse_ethernet {
-        packet.extract(hdr.ethernet);
-        transition select(hdr.ethernet.etherType) {
-            TYPE_MYTUNNEL: parse_myTunnel;
-            TYPE_IPV4: parse_ipv4;
-            default: accept;
-        }
-    }
-
-    state parse_myTunnel {
-        packet.extract(hdr.myTunnel);
-        transition select(hdr.myTunnel.proto_id) {
-            TYPE_IPV4: parse_ipv4;
-            default: accept;
-        }
-    }
-
-    state parse_ipv4 {
-        packet.extract(hdr.ipv4);
-        transition accept;
-    }
-
-}
-
-control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
-    apply {}
-}
-
-control MyIngress(inout headers hdr,
-                  inout metadata meta,
-                  inout standard_metadata_t standard_metadata) {
-    action drop() {
-        mark_to_drop(standard_metadata);
-    }
-
-    action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-        standard_metadata.egress_spec = port;
-        hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
-        hdr.ethernet.dstAddr = dstAddr;
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
-    }
-
-    table ipv4_lpm {
-        key = {
-            hdr.ipv4.dstAddr: lpm;
-        }
-        actions = {
-            ipv4_forward;
-            drop;
-            NoAction;
-        }
-        size = 1024;
-        default_action = drop();
-    }
-
-    action myTunnel_forward(egressSpec_t port) {
-        standard_metadata.egress_spec = port;
-    }
-
-    table myTunnel_exact {
-        key = {
-            hdr.myTunnel.dst_id: exact;
-        }
-        actions = {
-            myTunnel_forward;
-            drop;
-        }
-        size = 1024;
-        default_action = drop();
-    }
-
-    apply {
-        if (hdr.ipv4.isValid() && !hdr.myTunnel.isValid()) {
-            ipv4_lpm.apply();
-        }
-
-        if (hdr.myTunnel.isValid()) {
-            myTunnel_exact.apply();
-        }
-    }
-}
-
-control MyEgress(inout headers hdr,
-                 inout metadata meta,
-                 inout standard_metadata_t standard_metadata) {
-    apply {}
-}
-
-control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
-     apply {
-        update_checksum(
-            hdr.ipv4.isValid(),
-            {
-                hdr.ipv4.version,
-                hdr.ipv4.ihl,
-                hdr.ipv4.diffserv,
-                hdr.ipv4.totalLen,
-                hdr.ipv4.identification,
-                hdr.ipv4.flags,
-                hdr.ipv4.fragOffset,
-                hdr.ipv4.ttl,
-                hdr.ipv4.protocol,
-                hdr.ipv4.srcAddr,
-                hdr.ipv4.dstAddr
-            },
-            hdr.ipv4.hdrChecksum,
-            HashAlgorithm.csum16
-        );
-    }
-}
-
-control MyDeparser(packet_out packet, in headers hdr) {
-    apply {
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.myTunnel);
-        packet.emit(hdr.ipv4);
-    }
-}
-
-V1Switch(
-    MyParser(),
-    MyVerifyChecksum(),
-    MyIngress(),
-    MyEgress(),
-    MyComputeChecksum(),
-    MyDeparser()
-) main;
-```
+<<< @/sdn/codes/p4exercise/basic_tunnel.p4
 
 ## 3 练习三：P4Runtime
 
@@ -895,147 +404,7 @@ sudo netstat -lpnt
 
 ### 3.5 完整代码
 
-```py
-import argparse
-import os
-import sys
-from time import sleep
-
-import grpc
-
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utils/'))
-import p4runtime_lib.bmv2
-import p4runtime_lib.helper
-from p4runtime_lib.switch import ShutdownAllSwitchConnections
-
-SWITCH_TO_HOST_PORT = 1
-SWITCH_TO_SWITCH_PORT = 2
-
-
-def writeTunnelRules(p4info_helper, ingress_sw, egress_sw, tunnel_id, dst_eth_addr, dst_ip_addr):
-    table_entry = p4info_helper.buildTableEntry(
-        table_name="MyIngress.ipv4_lpm",
-        match_fields={ "hdr.ipv4.dstAddr": (dst_ip_addr, 32) },
-        action_name="MyIngress.myTunnel_ingress",
-        action_params={ "dst_id": tunnel_id })
-    ingress_sw.WriteTableEntry(table_entry)
-    print("Installed ingress tunnel rule on %s" % ingress_sw.name)
-
-    table_entry = p4info_helper.buildTableEntry(
-        table_name="MyIngress.myTunnel_exact",
-        match_fields={ "hdr.myTunnel.dst_id": tunnel_id },
-        action_name="MyIngress.myTunnel_forward",
-        action_params={ "port": SWITCH_TO_SWITCH_PORT })
-    ingress_sw.WriteTableEntry(table_entry)
-    print("Installed transit tunnel rule on %s" % ingress_sw.name)
-
-    table_entry = p4info_helper.buildTableEntry(
-        table_name="MyIngress.myTunnel_exact",
-        match_fields={ "hdr.myTunnel.dst_id": tunnel_id },
-        action_name="MyIngress.myTunnel_egress",
-        action_params={
-            "dstAddr": dst_eth_addr,
-            "port": SWITCH_TO_HOST_PORT
-        })
-    egress_sw.WriteTableEntry(table_entry)
-    print("Installed egress tunnel rule on %s" % egress_sw.name)
-
-
-def readTableRules(p4info_helper, sw):
-    print('\n----- Reading tables rules for %s -----' % sw.name)
-    for response in sw.ReadTableEntries():
-        for entity in response.entities:
-            entry = entity.table_entry
-            table_name = p4info_helper.get_tables_name(entry.table_id)
-            print('%s: ' % table_name, end=' ')
-            for m in entry.match:
-                print(p4info_helper.get_match_field_name(table_name, m.field_id), end=' ')
-                print('%r' % (p4info_helper.get_match_field_value(m),), end=' ')
-            action = entry.action.action
-            action_name = p4info_helper.get_actions_name(action.action_id)
-            print('->', action_name, end=' ')
-            for p in action.params:
-                print(p4info_helper.get_action_param_name(action_name, p.param_id), end=' ')
-                print('%r' % p.value, end=' ')
-            print()
-
-def printCounter(p4info_helper, sw, counter_name, index):
-    for response in sw.ReadCounters(p4info_helper.get_counters_id(counter_name), index):
-        for entity in response.entities:
-            counter = entity.counter_entry
-            print("%s %s %d: %d packets (%d bytes)" % (
-                sw.name, counter_name, index,
-                counter.data.packet_count, counter.data.byte_count
-            ))
-
-def printGrpcError(e):
-    print("gRPC Error:", e.details(), end=' ')
-    status_code = e.code()
-    print("(%s)" % status_code.name, end=' ')
-    traceback = sys.exc_info()[2]
-    print("[%s:%d]" % (traceback.tb_frame.f_code.co_filename, traceback.tb_lineno))
-
-def main(p4info_file_path, bmv2_file_path):
-    p4info_helper = p4runtime_lib.helper.P4InfoHelper(p4info_file_path)
-
-    try:
-        s1 = p4runtime_lib.bmv2.Bmv2SwitchConnection(
-            name='s1',
-            address='127.0.0.1:50051',
-            device_id=0,
-            proto_dump_file='logs/s1-p4runtime-requests.txt')
-        s2 = p4runtime_lib.bmv2.Bmv2SwitchConnection(
-            name='s2',
-            address='127.0.0.1:50052',
-            device_id=1,
-            proto_dump_file='logs/s2-p4runtime-requests.txt')
-
-        s1.MasterArbitrationUpdate()
-        s2.MasterArbitrationUpdate()
-
-        s1.SetForwardingPipelineConfig(p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2_file_path)
-        print("Installed P4 Program using SetForwardingPipelineConfig on s1")
-        s2.SetForwardingPipelineConfig(p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2_file_path)
-        print("Installed P4 Program using SetForwardingPipelineConfig on s2")
-
-        writeTunnelRules(p4info_helper, ingress_sw=s1, egress_sw=s2, tunnel_id=100, dst_eth_addr="08:00:00:00:02:22", dst_ip_addr="10.0.2.2")
-        writeTunnelRules(p4info_helper, ingress_sw=s2, egress_sw=s1, tunnel_id=200, dst_eth_addr="08:00:00:00:01:11", dst_ip_addr="10.0.1.1")
-
-        readTableRules(p4info_helper, s1)
-        readTableRules(p4info_helper, s2)
-
-        while True:
-            sleep(2)
-            print('\n----- Reading tunnel counters -----')
-            printCounter(p4info_helper, s1, "MyIngress.ingressTunnelCounter", 100)
-            printCounter(p4info_helper, s2, "MyIngress.egressTunnelCounter", 100)
-            printCounter(p4info_helper, s2, "MyIngress.ingressTunnelCounter", 200)
-            printCounter(p4info_helper, s1, "MyIngress.egressTunnelCounter", 200)
-
-    except KeyboardInterrupt:
-        print(" Shutting down.")
-    except grpc.RpcError as e:
-        printGrpcError(e)
-
-    ShutdownAllSwitchConnections()
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='P4Runtime Controller')
-    parser.add_argument('--p4info', help='p4info proto in text format from p4c', type=str, action="store", required=False, default='./build/advanced_tunnel.p4.p4info.txt')
-    parser.add_argument('--bmv2-json', help='BMv2 JSON file from p4c', type=str, action="store", required=False, default='./build/advanced_tunnel.json')
-    args = parser.parse_args()
-
-    if not os.path.exists(args.p4info):
-        parser.print_help()
-        print("\np4info file not found: %s\nHave you run 'make'?" % args.p4info)
-        parser.exit(1)
-    if not os.path.exists(args.bmv2_json):
-        parser.print_help()
-        print("\nBMv2 JSON file not found: %s\nHave you run 'make'?" % args.bmv2_json)
-        parser.exit(1)
-    main(args.p4info, args.bmv2_json)
-
-```
+<<< @/sdn/codes/p4exercise/mycontroller.py
 
 ## 4 练习四：显式拥塞通知
 
