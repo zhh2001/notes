@@ -9,7 +9,7 @@ footer: false
 
 :student:姓名：张恒华  
 :phone:电话：166****6316  
-:email:邮箱：<a href="mailto:1652709417@qq.com">1652709417@qq.com</a>  
+:email:邮箱：<a href="mailto:1652709417@qq.com">1652709417@qq.com</a>、<a href="mailto:zhang@sues.edu.cn">zhang@sues.edu.cn</a>  
 :computer:研究方向：软件定义网络、可编程数据平面
 
 ## 教育背景
