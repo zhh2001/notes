@@ -245,6 +245,13 @@ export default defineConfig({
     ],
   ],
   markdown: {
+    container: {
+      dangerLabel: '危险',
+      detailsLabel: '详细信息',
+      infoLabel: '信息',
+      tipLabel: '提示',
+      warningLabel: '警告',
+    },
     math: true,
     languageAlias: {
       'p4': 'c++',
@@ -345,4 +352,22 @@ export default defineConfig({
   sitemap: {
     hostname: 'https://zhh2001.github.io',
   },
+
+  // 构建钩子
+  async buildEnd(siteConfig) {
+    console.log('Build End')
+    console.log(siteConfig)
+  },
+  async postRender(context) {
+    console.log('Post Render')
+    console.log(context)
+  },
+  async transformHead(context) {
+    console.log('Transform Head')
+    console.log(context)
+  },
+  async transformHtml(code, id, context) {
+    console.log('Transform HTML')
+    console.log(code, id, context)
+  }
 })
