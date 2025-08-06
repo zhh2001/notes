@@ -244,6 +244,13 @@ export default defineConfig({
       `,
     ],
   ],
+  i18nRouting: false,
+  locales: {
+    root: {
+      label: '中文',
+      lang: 'zh-Hans',
+    },
+  },
   markdown: {
     container: {
       dangerLabel: '危险',

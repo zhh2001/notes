@@ -3,14 +3,20 @@ sidebar: false
 prev: false
 next: false
 footer: false
+i18nRouting: false
 ---
 
 # 个人简历
 
-:student:姓名：张恒华  
-:phone:电话：166****6316  
-:email:邮箱：<a href="mailto:1652709417@qq.com">1652709417@qq.com</a>、<a href="mailto:zhang@sues.edu.cn">zhang@sues.edu.cn</a>  
-:computer:研究方向：软件定义网络、可编程数据平面
+:student:姓名：张恒华
+
+:phone:电话：+86 166 **** 6316
+
+:email:邮箱：<a href="mailto:1652709417@qq.com">1652709417@qq.com</a>、<a href="mailto:zhang@sues.edu.cn">zhang@sues.edu.cn</a>
+
+:brain:研究方向：软件定义网络、可编程数据平面、带内网络遥测
+
+:computer:GitHub主页：[https://github.com/zhh2001](https://github.com/zhh2001)
 
 ## 教育背景
 
@@ -19,6 +25,10 @@ footer: false
 
 2018.09-2022.06 湖南工商大学 <Badge type="tip" text="本科" />  
 理学院 | 数据科学与大数据技术
+
+## 学术成果
+
+5 篇在投，1 篇在写。
 
 ## 工作经历
 
