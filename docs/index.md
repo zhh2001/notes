@@ -3,7 +3,7 @@ layout: home
 hero:
   name: 张恒华
   text: 技术爱好者
-  tagline: SDN, OpenFlow, Mininet, Ryu, P4, gRPC
+  tagline: SDN, OpenFlow, Mininet, PDP, P4, INT
   image:
     src: /typewriter.svg
     alt: Typewriter
