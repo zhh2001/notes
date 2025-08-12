@@ -4,6 +4,37 @@
     --vp-font-family-base: "宋体", "SimSun", "Noto Serif SC", "Punctuation SC", "Inter", ui-sans-serif, system-ui, "PingFang SC", "Noto Sans CJK SC", "Noto Sans SC", "Heiti SC", "Microsoft YaHei", "DengXian", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+.VPHome {
+    margin-bottom: 64px !important;
+}
+
+.VPHome .VPHomeFeatures {
+    margin-bottom: 32px !important;
+}
+
+.VPHome .VPTeamMembers.small.count-1 .container {
+    display: block;
+    max-width: 100% !important;
+}
+
+.VPHome .VPTeamMembers .container .item {
+    width: 100%;
+}
+
+.VPHome .VPTeamMembers .VPTeamMembersItem {
+    width: 100%;
+    border: 1px solid var(--vp-c-bg-soft);
+    transition: border-color 0.25s;
+}
+
+.VPHome .VPTeamMembers .VPTeamMembersItem:hover {
+    border-color: var(--vp-c-brand-1);
+}
+
+.VPHome .ToResume {
+    text-decoration: none;
+}
+
 .VPHome .VPHero .image-container {
     height: 256px;
 }

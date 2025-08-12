@@ -37,3 +37,42 @@ features:
     link: /go/grpc
     linkText: 查看笔记
 ---
+
+---
+
+<script setup>
+import { VPTeamMembers } from 'vitepress/theme';
+
+const members = [
+  {
+    avatar: '/sues.png',
+    name: 'Henghua Zhang',
+    title: 'SDN Researcher',
+    org: 'SUES',
+    orgLink: 'https://www.sues.edu.cn/',
+    desc: 'Focused on programmable networks, in-band telemetry',
+    sponsor: '/sponsor',
+    actionText: 'Sponsor',
+    links: [
+      {
+        icon: 'csdn',
+        link: 'https://blog.csdn.net/qq_43133192',
+      },
+      {
+        icon: 'github',
+        link: 'https://github.com/zhh2001',
+      },
+      {
+        icon: 'qq',
+        link: 'mailto:1652709417@qq.com',
+      },
+    ],
+  },
+]
+</script>
+
+<div align="center">
+  <a href="/resume" class="ToResume">
+    <VPTeamMembers size="small" :members />
+  </a>
+</div>
