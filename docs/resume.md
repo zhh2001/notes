@@ -3,7 +3,7 @@ sidebar: false
 prev: false
 next: false
 footer: false
-i18nRouting: false
+editLink: false
 ---
 
 # 个人简历

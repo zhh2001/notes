@@ -4,6 +4,7 @@ sidebar: false
 prev: false
 next: false
 footer: false
+editLink: false
 ---
 
 **MIT License**

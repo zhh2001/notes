@@ -277,6 +277,12 @@ export default defineConfig({
       prev: '上一页',
       next: '下一页',
     },
+    editLink: {
+      pattern: ({ filePath }) => {
+        return `https://github.com/zhh2001/notes/tree/main/docs/${filePath}`
+      },
+      text: '在 GitHub 上编辑此页面',
+    },
     footer: {
       message: '基于 <a href="/mit">MIT 许可</a> 发布',
       copyright: '版权所有 © 2024至今 <a href="/resume">张恒华</a>',

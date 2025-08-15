@@ -5,6 +5,7 @@ sidebar: false
 prev: false
 next: false
 footer: false
+editLink: false
 ---
 
 这个网站是我平时折腾技术、记录笔记的小角落，如果能刚好帮到你就很值。
