@@ -14,4 +14,4 @@ editLink: false
 
 赞助过的小伙伴，可以告诉我你的链接，我可以添到我的友链页。
 
-<img src="/wepay.png" width="280" />
+<img src="/wepay.png" width="280" alt="WePay" />
