@@ -357,6 +357,10 @@ export default defineConfig({
         link: 'https://github.com/zhh2001',
       },
       {
+        icon: 'orcid',
+        link: 'https://orcid.org/0009-0005-9456-8936',
+      },
+      {
         icon: 'qq',
         link: 'mailto:1652709417@qq.com',
       },
@@ -364,6 +368,11 @@ export default defineConfig({
   },
   sitemap: {
     hostname: 'https://zhh2001.github.io',
+    transformItems: items => {
+      console.log('Transform Items')
+      console.log(items)
+      return items
+    }
   },
 
   // 构建钩子
