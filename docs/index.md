@@ -50,7 +50,7 @@ const members = [
     title: 'SDN Researcher',
     org: 'SUES',
     orgLink: 'https://www.sues.edu.cn/',
-    desc: 'Focused on programmable networks, in-band telemetry',
+    desc: 'Focused on programmable networks, in-band network telemetry',
     sponsor: '/sponsor',
     actionText: 'Sponsor',
     links: [
@@ -61,6 +61,10 @@ const members = [
       {
         icon: 'github',
         link: 'https://github.com/zhh2001',
+      },
+      {
+        icon: 'orcid',
+        link: 'https://orcid.org/0009-0005-9456-8936',
       },
       {
         icon: 'qq',
