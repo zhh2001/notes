@@ -26,50 +26,6 @@ const SDNNoteItems = [
     link: '/sdn/iperf'
   },
   {
-    text: 'Reading',
-    link: '/sdn/reading/',
-    items: [
-      {
-        text: 'SDN Paper',
-        link: '/sdn/reading/paper'
-      },
-      {
-        text: 'SDN Monitoring',
-        collapsed: true,
-        items: [
-          {
-            text: 'APAM',
-            link: '/sdn/reading/monitoring/apam'
-          },
-          {
-            text: 'DLINT & PLINT',
-            link: '/sdn/reading/monitoring/lint'
-          },
-          {
-            text: 'FlowStalker',
-            link: '/sdn/reading/monitoring/FlowStalker'
-          },
-          {
-            text: 'FAPM',
-            link: '/sdn/reading/monitoring/fapm'
-          },
-          {
-            text: 'FS-INT',
-            link: '/sdn/reading/monitoring/FS-INT'
-          },
-          {
-            text: 'Marina',
-            link: '/sdn/reading/monitoring/marina'
-          },
-          {
-            text: 'PPM',
-            link: '/sdn/reading/monitoring/ppm'
-          },
-        ]
-      },
-    ]
-  },
-  {
     text: 'Writing',
     link: '/sdn/writing/',
     items: [
@@ -94,10 +50,6 @@ const SDNNoteItems = [
   {
     text: 'CCF',
     link: '/sdn/ccf'
-  },
-  {
-    text: 'Journal',
-    link: '/sdn/journal'
   },
 ]
 const GoNoteItems = [
