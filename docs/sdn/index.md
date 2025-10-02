@@ -5,7 +5,7 @@ next: false
 
 # SDN
 
-Software Defined Network，软件定义网络。
+Software-Defined Networking，软件定义网络。
 
 ## 什么是 SDN
 

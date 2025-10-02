@@ -23,6 +23,9 @@ const GoNoteItems = [
   { text: 'Gin', link: '/go/gin' },
   { text: 'gRPC', link: '/go/grpc' }
 ]
+const InterviewItems = [
+  { text: 'GoLang', link: '/interview/go' }
+]
 
 const keywords = [
   '张恒华',
@@ -136,7 +139,8 @@ export default defineConfig({
         text: '学习笔记',
         items: [
           { text: 'SDN', items: SDNNoteItems },
-          { text: 'Go', items: GoNoteItems }
+          { text: 'Go', items: GoNoteItems },
+          { text: 'Interview', items: InterviewItems },
         ],
       },
       { text: '关于我', link: '/resume' }
@@ -161,7 +165,8 @@ export default defineConfig({
     },
     sidebar: [
       { text: 'SDN', link: '/sdn/', items: SDNNoteItems },
-      { text: 'Go', items: GoNoteItems }
+      { text: 'Go', items: GoNoteItems },
+      { text: 'Interview', items: InterviewItems },
     ],
     notFound: {
       code: '404',

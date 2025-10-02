@@ -45,9 +45,9 @@ editLink: false
 ## 项目经历
 
 2024.11-2025.02 懂经营 <Badge type="tip" text="兼职" />  
-项目主体：红砥集团  
+项目主体：红砥智能  
 岗位：微信小程序开发工程师  
-技术栈：`HTML`、`CSS`、`JavaScript`、`SASS`、`ECharts`、`VantUI`、`Git`
+技术栈：`WXML`、`WXS`、`SASS`、`ECharts`、`VantUI`、`Git`
 
 2024.01-2024.08 凤凰山项目 <Badge type="tip" text="全职" />  
 项目主体：华为上研  
