@@ -200,4 +200,328 @@ fmt.Println(m[math.NaN()] == 100)     // false
 fmt.Println(math.NaN() == math.NaN()) // false
 ```
 
-### 1.7 判断两个对象是否完全相同
+### 1.7 判断对象是否有某个方法
+
+```go
+type Person1 struct {
+	Name string
+}
+
+func (p *Person1) SayHi() string {
+	return "Hi"
+}
+
+type Person2 struct {
+	Name string
+}
+
+// 方法一：类型断言，性能好（无反射开销）
+func HasMethodSay(v interface{}) bool {
+	_, has := v.(interface {
+		SayHi() string
+	})
+	return has
+}
+
+// 方法二：通过反射，灵活性高，可以通过字符串动态指定方法名
+func HasMethod(v interface{}, methodName string) bool {
+	obj := reflect.ValueOf(v)
+	method := obj.MethodByName(methodName)
+	if !method.IsValid() {
+		return false
+	}
+	return true
+}
+
+func main() {
+	p1 := &Person1{"Zhang"}
+	p2 := &Person2{"Zhang"}
+
+	// 方法一
+	fmt.Println(HasMethodSay(p1)) // true
+	fmt.Println(HasMethodSay(p2)) // false
+
+	// 方法二：通过反射
+	fmt.Println(HasMethod(p1, "SayHi")) // true
+	fmt.Println(HasMethod(p2, "SayHi")) // false
+}
+```
+
+## 2 高级篇
+
+### 2.1 `switch`
+
+#### 2.1.1 基础特性：自动 `break`（与其他语言的核心区别）
+
+Go 的 `switch` 中，每个 `case` 执行完毕后**自动终止**（无需显式写 `break`），不会像 C/C++ 那样默认穿透到下一个 `case`。
+
+```go
+num := 2
+switch num {
+case 1:
+	fmt.Println("1")
+case 2:
+	fmt.Println("2") // 执行后自动退出switch，不会继续执行case 3
+case 3:
+	fmt.Println("3")
+}
+```
+
+#### 2.1.2 `fallthrough`
+
+如果需要像 C++ 那样执行当前 `case` 后继续执行下一个 `case`，需显式使用 `fallthrough`。
+
+**注意事项**：
+- `fallthrough` 必须放在 `case` 块的最后一行。
+- 会忽略下一个 `case` 的条件，直接执行其代码块。
+- 不能用在最后一个 `case` 中（否则编译错误）。
+
+
+```go
+num := 1
+switch num {
+case 1:
+	fmt.Println("1")
+	fallthrough // 强制执行下一个case
+case 2:
+	fmt.Println("2") // 即使num≠2，仍会执行
+}
+```
+
+#### 2.1.3 无表达式
+
+等价于 `switch true`（类似 if-else 链）。
+
+```go
+age := 25
+switch { // 等价于 switch true
+case age < 18:
+	fmt.Println("未成年")
+case age >= 18 && age < 30:
+	fmt.Println("青年") // 匹配成功
+}
+```
+
+#### 2.1.4 类型 switch：判断接口动态类型
+
+通过 `switch v.(type)` 语法判断接口变量 `v` 的动态类型（即接口实际存储的值的类型）。
+
+```go
+var x interface{} = "hello"
+switch t := x.(type) { // t是x的值，类型为case匹配的类型
+case int:
+	fmt.Printf("int: %d\n", t)
+case string:
+	fmt.Printf("string: %s\n", t) // 匹配成功，输出 "string: hello"
+default:
+	fmt.Printf("unknown type: %T\n", t)
+}
+```
+
+#### 2.1.5 `switch` 内的变量声明
+
+可以在 `switch` 后直接声明变量，其作用域仅限于 `switch` 块内。
+
+```go
+switch num := 3; num { // 声明变量num，仅在switch内有效
+case 1:
+	fmt.Println(1)
+case 3:
+	fmt.Println(3) // 执行
+}
+```
+
+### 2.2 `defer`
+
+#### 2.2.1 基础特性
+
+`defer` 用于延迟一个函数（或方法）的执行，延迟到包含它的函数（父函数）返回前执行（无论父函数是正常返回还是因 `panic` 异常退出）。
+
+```go
+func main() {
+	fmt.Println("start")
+	defer fmt.Println("defer 1") // 延迟到 main 返回前执行
+	fmt.Println("end")
+}
+// 输出顺序：start → end → defer 1
+```
+
+#### 2.2.2 执行顺序——后进先出（LIFO）
+
+多个 `defer` 按声明顺序入栈，父函数返回时按栈顶到栈底顺序执行（最后声明的 `defer` 最先执行）。
+
+```go
+func main() {
+	defer fmt.Println("1") // 先入栈
+	defer fmt.Println("2") // 后入栈，返回时先执行
+	defer fmt.Println("3") // 最后入栈，最先执行
+}
+// 输出顺序：3 → 2 → 1
+```
+
+#### 2.2.3 参数捕获时机——声明时计算
+
+`defer` 后面的函数参数，会在 `defer` 声明的那一刻计算出值并固定（捕获），而非延迟函数执行时计算。
+
+```go
+func main() {
+	i := 0
+	defer fmt.Println("defer:", i) // 声明时 i=0，参数固定为 0
+	i = 100                        // 修改 i 不影响已捕获的参数
+	fmt.Println("main:", i)
+}
+// 输出：main: 100 → defer: 0（而非 100）
+```
+
+::: warning 注意
+如果 `defer` 后面是匿名函数（闭包），且函数内部引用了外部变量，则变量的值会在延迟函数执行时读取（而非声明时），因为此时变量不是函数的参数，而是闭包的外部引用。
+:::
+
+```go
+func main() {
+	i := 0
+	defer func() {
+		// 这里的i是闭包引用的外部变量，不是函数参数
+		// 延迟函数执行时（main返回前）才会读取i的当前值
+		fmt.Println("defer:", i)
+	}()
+	i = 100 // 延迟函数执行前修改i，会影响输出结果
+	fmt.Println("main:", i)
+}
+// 输出：main: 100 → defer: 100
+```
+
+#### 2.2.4 与函数返回值的交互（命名返回值 vs 匿名返回值）
+
+**仅当返回值是命名返回值时**，`defer` 能影响函数返回值。
+
+```go
+func f1() int {
+	i := 10
+	defer func() { i += 5 }() // 修改的是局部变量 i，而非返回值
+	return i                  // 返回的是 i 的副本（匿名返回值），此时 i=10
+}
+
+func f2() (i int) { // 命名返回值 i，函数开始时已初始化（默认 0）
+	i = 10
+	defer func() { i += 5 }() // 直接修改命名返回值 i
+	return                    // 等价于 return i，此时 i 已被修改为 15
+}
+
+func main() {
+	fmt.Println(f1()) // 输出 10（而非 15）
+	fmt.Println(f2()) // 输出 15
+}
+```
+
+#### 2.2.5 常见使用场景
+
+1. **资源释放**：确保文件、网络连接、锁等资源在函数结束后释放，避免泄漏（无论函数正常还是异常退出，资源都能释放）。
+	```go
+	// 示例：文件关闭
+	func readFile(path string) {
+		file, err := os.Open(path)
+		if err != nil {
+			return
+		}
+		defer file.Close() // 函数返回前自动关闭文件，即使后续代码报错
+		// 读取文件逻辑...
+	}
+
+	// 示例：互斥锁释放
+	var mu sync.Mutex
+	func safeAdd() {
+		mu.Lock()
+		defer mu.Unlock() // 函数结束后自动解锁，避免死锁
+		// 并发安全操作...
+	}
+	```
+
+2. **捕获 `panic`**：在 `defer` 中用 `recover()` 捕获父函数的 `panic`，实现异常恢复（避免程序崩溃）。
+	```go
+	func risky() {
+		defer func() {
+			if err := recover(); err != nil {
+				fmt.Printf("捕获异常：%v\n", err) // 捕获 panic，程序不会崩溃
+			}
+		}()
+		panic("致命错误") // 触发 panic
+	}
+
+	func main() {
+		risky()
+		fmt.Println("程序继续执行") // 正常输出
+	}
+	```
+
+### 2.3 channel
+
+#### 2.3.1 基础特性
+
+channel 是 Go 语言中用于 **goroutine 间通信** 的核心机制，通过传递数据实现 goroutine 同步，而非共享内存。
+
+底层是一个带锁的队列（或环形缓冲区），保证并发安全（多个 goroutine 操作同一个 channel 无需额外加锁）。
+
+#### 2.3.2 核心分类：无缓冲 channel vs 有缓冲 channel
+
+两者的核心区别在于 **是否有数据缓冲区**，直接影响发送 / 接收操作的阻塞行为。
+
+1. 无缓冲 channel（`make(chan Type)`）
+    - **特点**：没有缓冲区，发送和接收操作 **必须同步**，发送方会阻塞直到有接收方接收数据，接收方会阻塞直到有发送方发送数据。
+    - **示例**：有容量为 `n` 的缓冲区，发送和接收操作的阻塞条件与缓冲区状态相关：
+		```go
+		ch := make(chan int)
+		go func() {
+			ch <- 100 // 发送方：阻塞等待接收方
+		}()
+		fmt.Println(<-ch) // 接收方：阻塞等待发送方，输出 100
+		```
+
+2. 有缓冲 channel（`make(chan Type, n)`）
+	- **特点**：有容量为 `n` 的缓冲区，发送和接收操作的阻塞条件与缓冲区状态相关：
+    	- 发送操作：缓冲区未满时，数据存入缓冲区，不阻塞；缓冲区满时，发送方阻塞直到有数据被接收。
+    	- 接收操作：缓冲区非空时，直接取数据，不阻塞；缓冲区空时，接收方阻塞直到有数据被发送。
+  	- **示例**：
+		```go
+		ch := make(chan int, 2) // 容量为2的有缓冲channel
+		ch <- 1                 // 缓冲区未满（1/2），不阻塞
+		ch <- 2                 // 缓冲区满（2/2），不阻塞
+		//ch <- 3                 // 缓冲区满，发送方阻塞（若无人接收）
+
+		fmt.Println(<-ch) // 取走1，缓冲区剩1（1/2），不阻塞
+		fmt.Println(<-ch) // 取走2，缓冲区空，若再接收会阻塞
+		```
+
+#### 2.3.3 与 `select` 配合
+
+`select` 用于同时监听多个 channel 的发送 / 接收操作，是 channel 最常用的高级特性。
+
+1. **基本行为**
+	- `select` 会阻塞等待 **任意一个 `case` 可执行**，然后执行该 `case`。
+	- 若 **多个 `case` 同时可执行**：随机选择一个执行（避免某一 channel 饥饿）。
+	- 若 **所有 `case` 都不可执行**：
+    	- 有 `default` 分支：执行 `default`（非阻塞模式）。
+    	- 无 `default` 分支：`select` 阻塞，直到某个 `case` 可执行。
+
+2. **常见用法**
+	- **示例 1：非阻塞接收**（避免在空 channel 上阻塞）：
+		```go
+		ch := make(chan int)
+		select {
+		case val := <-ch:
+			fmt.Println("接收:", val)
+		default:
+			fmt.Println("channel 为空，不阻塞") // 执行此分支
+		}
+		```
+	- **示例 2：超时控制**（避免永久阻塞）：
+		```go
+		ch := make(chan int)
+		select {
+		case val := <-ch:
+			fmt.Println("接收:", val)
+		case <-time.After(1 * time.Second): // 1秒后超时
+			fmt.Println("超时") // 1秒内无数据则执行
+		}
+		```
+
