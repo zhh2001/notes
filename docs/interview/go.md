@@ -525,3 +525,86 @@ channel 是 Go 语言中用于 **goroutine 间通信** 的核心机制，通过�
 		}
 		```
 
+### 2.4 鸭子类型
+
+鸭子类型是一种以行为定义类型的设计思想，核心原则是 **如果一个东西看起来像鸭子、走起来像鸭子、叫起来像鸭子，那它就可以被当作鸭子**。它不关注对象的具体类型，只关注对象是否具备所需的 “行为”（即方法或属性）。
+
+Go 没有类和继承，而是通过**接口（interface）** 实现鸭子类型，且是 隐式接口（无需显式声明 实现了某接口），这是 Go 的核心设计特点之一。
+
+在 Go 中，**只要一个结构体（或其他类型）拥有某接口的 全部方法**，就会被视为 实现了该接口，无需像 Java 那样用 `implements` 显式声明。此时，该结构体的实例就可以被当作接口类型使用。
+
+```go
+// 1. 定义一个接口（代表“能叫”的行为）
+type Speaker interface {
+	Speak() string // 所需行为：能发出声音（Speak方法）
+}
+
+// 2. 定义两个不同类型的结构体（无继承关系）
+type Dog struct {
+	Name string
+}
+type Cat struct {
+	Age int
+}
+
+// 3. 给两个结构体分别实现Speak方法（具备“叫”的行为）
+func (d *Dog) Speak() string {
+	return d.Name + ": 汪汪汪"
+}
+
+func (c *Cat) Speak() string {
+	return fmt.Sprintf("猫咪（%d岁）: 喵喵喵", c.Age)
+}
+
+// 4. 定义一个函数：接收“能叫的对象”（即Speaker接口）
+func WakeUp(s Speaker) {
+	fmt.Println("唤醒声音：", s.Speak())
+}
+
+func main() {
+	// Dog和Cat虽类型不同，但都有Speak方法（具备“叫”的行为）
+	// 因此都能传给WakeUp（接收Speaker接口）
+	dog := &Dog{Name: "阿黄"}
+	cat := &Cat{Age: 2}
+
+	WakeUp(dog) // 输出：唤醒声音：阿黄: 汪汪汪
+	WakeUp(cat) // 输出：唤醒声音：猫咪（2岁）: 喵喵喵
+}
+```
+
+### 2.5 重载（Overload）
+
+同一作用域内，**函数名相同但参数列表（类型、个数、顺序）不同**的函数，编译器通过参数匹配调用对应实现（如 Java/C++）。
+
+Go 明确不支持重载。Go 在同一包、同一作用域内，不允许定义同名函数或同名方法（即使参数列表不同），编译会直接报错。
+
+```go
+type Calculator struct{}
+
+// 编译错误：method Calculator.Add already declared
+func (c *Calculator) Add(x, y int) int {
+	return x + y
+}
+func (c *Calculator) Add(x, y, z int) int {
+	return x + y + z
+}
+```
+
+### 2.6 重写（Override）
+
+```go
+type Parent struct{}
+func (p Parent) F() { fmt.Println("Parent.F") }
+
+type Child struct{ Parent } // 嵌套Parent
+func (c Child) F() { fmt.Println("Child.F") } // 隐藏Parent.F
+
+func main() {
+	c := Child{}
+	c.F()        // 输出：Child.F（调用外层方法）
+	c.Parent.F() // 需显式调用内层方法，输出：Parent.F
+
+	var p Parent = c.Parent
+	p.F() // 输出：Parent.F
+}
+```
