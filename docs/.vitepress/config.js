@@ -143,6 +143,7 @@ export default defineConfig({
           { text: 'Interview', items: InterviewItems },
         ],
       },
+      { text: '友情链接', link: '/links' },
       { text: '关于我', link: '/resume' }
     ],
     search: {

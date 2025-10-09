@@ -43,6 +43,10 @@
     max-width: 450px;
 }
 
+.VPTeamPage {
+    margin-top: 0 !important;
+}
+
 @media (max-width: 960px) {
     .VPHome .VPHero .image-container .VPImage {
         max-width: 360px;

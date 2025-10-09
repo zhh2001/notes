@@ -45,7 +45,7 @@ import { VPTeamMembers } from 'vitepress/theme';
 
 const members = [
   {
-    avatar: '/sues.png',
+    avatar: '/avatar.jpg',
     name: 'Henghua Zhang',
     title: 'SDN Researcher',
     org: 'SUES',
