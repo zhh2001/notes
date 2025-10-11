@@ -22,6 +22,64 @@ const mailIcon = {
 
 const members = [
   {
+    avatar: 'https://youpai.roccoshi.top/avatar.jpg',
+    name: 'Moreality\'s Blog',
+    title: 'Software Developer',
+    org: 'Amazon',
+    orgLink: 'https://www.amazon.com',
+    desc: 'The singularity is nearer.',
+    links: [
+      { icon: linkIcon, link: 'https://moreality.net' },
+      { icon: 'gmail', link: 'mailto:imroccoshi@gmail.com' },
+      { icon: 'github', link: 'https://github.com/Lincest' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/15255409' },
+      { icon: 'x', link: 'https://x.com/himoreality' },
+      { icon: 'rss', link: 'https://moreality.net/atom.xml' },
+    ]
+  },
+  {
+    avatar: 'https://i1-cdn.feizhuqwq.com/img-assets/logo/faviconHD.jpg',
+    name: 'feizhuqwq',
+    title: '软件开发者',
+    org: '',
+    orgLink: '',
+    desc: '因为不可能，所以才值得相信。',
+    links: [
+      { icon: linkIcon, link: 'https://blog.feizhuqwq.com' },
+      { icon: mailIcon, link: 'mailto:me@feizhuqwq.com' },
+      { icon: 'rss', link: 'https://blog.feizhuqwq.com/feed/' },
+    ]
+  },
+  {
+    avatar: 'https://hzz.cool/favicon.ico',
+    name: '何智政个人博客',
+    title: '后端开发',
+    org: '',
+    orgLink: '',
+    desc: '择善固执 守正出奇',
+    links: [
+      { icon: linkIcon, link: 'https://hzz.cool' },
+      { icon: 'gmail', link: 'mailto:dexter.ho.cn@gmail.com' },
+      { icon: 'github', link: 'https://github.com/hezhizheng' },
+      { icon: 'x', link: 'https://twitter.com/he_zhizheng' },
+      { icon: 'instagram', link: 'https://www.instagram.com/dexter_ho_cn' },
+      { icon: 'telegram', link: 'https://t.me/dexterho' },
+      { icon: 'sinaweibo', link: 'https://weibo.com/u/5675317400' },
+    ]
+  },
+  {
+    avatar: 'https://pic1.imgdb.cn/item/68b512ef58cb8da5c8689e8c.webp',
+    name: '一世繁华',
+    title: '水下机器人领域从业者',
+    org: '',
+    orgLink: '',
+    desc: '分享一二',
+    links: [
+      { icon: linkIcon, link: 'https://blog.hantaotao.top' },
+      { icon: mailIcon, link: 'mailto:tohantao@outlook.com' },
+    ]
+  },
+  {
     avatar: 'https://res.strikefreedom.top/static_res/blog/figures/avatar.png',
     name: 'Strike Freedom',
     title: 'Tech enthusiast',
@@ -70,20 +128,28 @@ const members = [
     ]
   },
   {
-    avatar: 'https://hzz.cool/favicon.ico',
-    name: '何智政个人博客',
-    title: '后端开发',
+    avatar: 'https://www.lishoujie.cn/static/images/logo.png',
+    name: '大壮博客',
+    title: 'Linux爱好者、开源爱好者、H5全栈开发爱好者、GoLang开发工程师',
     org: '',
     orgLink: '',
-    desc: '择善固执 守正出奇',
+    desc: '末日未来临，上帝不审人。',
     links: [
-      { icon: linkIcon, link: 'https://hzz.cool' },
-      { icon: 'gmail', link: 'dexter.ho.cn@gmail.com' },
-      { icon: 'github', link: 'https://github.com/hezhizheng' },
-      { icon: 'x', link: 'https://twitter.com/he_zhizheng' },
-      { icon: 'instagram', link: 'https://www.instagram.com/dexter_ho_cn' },
-      { icon: 'telegram', link: 'https://t.me/dexterho' },
-      { icon: 'sinaweibo', link: 'https://weibo.com/u/5675317400' },
+      { icon: linkIcon, link: 'https://www.lishoujie.cn' },
+    ]
+  },
+  {
+    avatar: 'https://typonotes.com/logo/avatar.png',
+    name: '老麦的书房',
+    title: 'a devops coder',
+    org: '',
+    orgLink: '',
+    desc: 'Go语言(golang)、 云原生、 DevOps、 可视化追踪。',
+    links: [
+      { icon: linkIcon, link: 'https://typonotes.com' },
+      { icon: 'github', link: 'https://github.com/tangx' },
+      { icon: 'x', link: 'https://twitter.com/tangx' },
+      { icon: 'rss', link: 'https://typonotes.com/index.xml' },
     ]
   },
 ]
