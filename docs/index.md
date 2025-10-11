@@ -70,6 +70,10 @@ const members = [
         icon: 'qq',
         link: 'mailto:1652709417@qq.com',
       },
+      {
+        icon: 'rss',
+        link: 'https://github.com/zhh2001.atom',
+      },
     ],
   },
 ]

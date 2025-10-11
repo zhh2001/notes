@@ -68,9 +68,15 @@ const keywords = [
   'Go',
   'GoLang',
   'RPC',
+  'Remote Procedure Call',
   'gRPC',
   'Goroutine',
+  'GMP',
   'Gin',
+  'Redis',
+  'MySQL',
+  'protobuf',
+  'Protocol Buffer',
 ]
 
 const description_cn = '张恒华的个人网站，存放学习笔记与个人简历。研究领域为软件定义网络、可编程数据平面。'
@@ -179,7 +185,8 @@ export default defineConfig({
       { icon: 'csdn', link: 'https://blog.csdn.net/qq_43133192' },
       { icon: 'github', link: 'https://github.com/zhh2001' },
       { icon: 'orcid', link: 'https://orcid.org/0009-0005-9456-8936' },
-      { icon: 'qq', link: 'mailto:1652709417@qq.com' }
+      { icon: 'qq', link: 'mailto:1652709417@qq.com' },
+      { icon: 'rss', link: 'https://github.com/zhh2001.atom' }
     ]
   },
   sitemap: { hostname: 'https://zhh2001.github.io' }

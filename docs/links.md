@@ -163,15 +163,15 @@ const templates = [
     orgLink: '',
     desc: '[网站描述]',
     links: [
-      { icon: linkIcon, ariaLabel: '网站链接' },
-      { icon: mailIcon, link: 'mailto:1652709417@qq.com', ariaLabel: '个人邮箱' },
       { icon: 'gmail', ariaLabel: 'Gmail' },
       { icon: 'qq', ariaLabel: 'QQ' },
       { icon: 'wechat', ariaLabel: 'WeChat' },
       { icon: 'sinaweibo', ariaLabel: '新浪微博' },
       { icon: 'zhihu', ariaLabel: '知乎' },
       { icon: 'bilibili', ariaLabel: 'B站' },
-      { icon: 'github', ariaLabel: 'GitHub' },
+      { icon: 'tiktok', ariaLabel: 'TikTok' },
+      { icon: 'youtube', ariaLabel: 'YouTube' },
+      { icon: 'facebook', ariaLabel: 'Facebook' },
     ]
   }
 ]
