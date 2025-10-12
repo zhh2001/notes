@@ -80,23 +80,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://res.strikefreedom.top/static_res/blog/figures/avatar.png',
-    name: 'Strike Freedom',
-    title: 'Tech enthusiast',
-    org: 'GNET',
-    orgLink: 'https://gnet.host',
-    desc: '潘少的博客、个人主页、技术分享：编程、动漫、读书、历史、随笔。',
-    links: [
-      { icon: linkIcon, link: 'https://strikefreedom.top' },
-      { icon: 'github', link: 'https://github.com/panjf2000' },
-      { icon: 'zhihu', link: 'https://www.zhihu.com/people/andy_pan' },
-      { icon: 'discord', link: 'https://discord.gg/UyKD7NZcfH' },
-      { icon: 'instagram', link: 'https://instagram.com/panjf2000' },
-      { icon: 'mastodon', link: 'https://mastodon.social/@andypan' },
-      { icon: 'x', link: 'https://twitter.com/panjf2000' },
-    ]
-  },
-  {
     avatar: 'https://chenmingyong.cn/static/4aa6f9aeeee31495a9fb2cc6d2f7a1ca.jpg',
     name: '陈明勇的博客',
     title: '程序员',
@@ -128,17 +111,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://www.lishoujie.cn/static/images/logo.png',
-    name: '大壮博客',
-    title: 'Linux爱好者、开源爱好者、H5全栈开发爱好者、GoLang开发工程师',
-    org: '',
-    orgLink: '',
-    desc: '末日未来临，上帝不审人。',
-    links: [
-      { icon: linkIcon, link: 'https://www.lishoujie.cn' },
-    ]
-  },
-  {
     avatar: 'https://typonotes.com/logo/avatar.png',
     name: '老麦的书房',
     title: 'a devops coder',
@@ -152,7 +124,156 @@ const members = [
       { icon: 'rss', link: 'https://typonotes.com/index.xml' },
     ]
   },
+  {
+    avatar: 'https://res.strikefreedom.top/static_res/blog/figures/avatar.png',
+    name: 'Strike Freedom',
+    title: 'Tech enthusiast',
+    org: 'GNET',
+    orgLink: 'https://gnet.host',
+    desc: '潘少的博客、个人主页、技术分享：编程、动漫、读书、历史、随笔。',
+    links: [
+      { icon: linkIcon, link: 'https://strikefreedom.top' },
+      { icon: 'github', link: 'https://github.com/panjf2000' },
+      { icon: 'zhihu', link: 'https://www.zhihu.com/people/andy_pan' },
+      { icon: 'discord', link: 'https://discord.gg/UyKD7NZcfH' },
+      { icon: 'instagram', link: 'https://instagram.com/panjf2000' },
+      { icon: 'mastodon', link: 'https://mastodon.social/@andypan' },
+      { icon: 'x', link: 'https://twitter.com/panjf2000' },
+    ]
+  },
+  {
+    avatar: 'https://static.miaoer.net/logo/avatar.webp',
+    name: '喵二の小博客',
+    title: '数码爱好者',
+    org: '广州某所大学',
+    orgLink: '',
+    desc: '缘，妙不可言',
+    links: [
+      { icon: linkIcon, link: 'https://www.miaoer.net' },
+      { icon: 'gmail', link: 'mailto:miaoermua@gmail.com' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/41605906' },
+      { icon: 'youtube', link: 'https://www.youtube.com/@miaoerchannel' },
+      { icon: 'telegram', link: 'https://t.me/miaoer' },
+      { icon: 'steam', link: 'https://steamcommunity.com/id/miaoermua' },
+      { icon: 'rss', link: 'https://www.miaoer.net/feed' },
+    ]
+  },
+  {
+    avatar: 'https://s2.loli.net/2025/02/19/gX19mThYxyUDaZu.gif',
+    name: 'Yesord',
+    title: '四年级学牲',
+    org: '猫军阀军校',
+    orgLink: '',
+    desc: '你相信光吗~~',
+    links: [
+      { icon: linkIcon, link: 'https://blog.yesord.top' },
+      { icon: 'gmail', link: 'xuruolun666@gmail.com' },
+      { icon: 'github', link: 'https://github.com/Yesord' },
+      { icon: 'csdn', link: 'https://blog.csdn.net/aoliba_believer' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/1527890846' },
+      { icon: 'rss', link: 'hhttps://home.yesord.top/atom.xml' },
+    ]
+  },
+  {
+    avatar: 'https://blog.grtsinry43.com/favicon.ico',
+    name: 'Grtsinry43\'s Blog',
+    title: '',
+    org: 'CSU',
+    orgLink: 'https://www.csu.edu.cn',
+    desc: '总之岁月漫长，然而值得等待',
+    links: [
+      { icon: linkIcon, link: 'https://blog.grtsinry43.com' },
+      { icon: 'github', link: 'https://github.com/grtsinry43' },
+      { icon: 'rss', link: 'https://blog.grtsinry43.com/feed' },
+    ]
+  },
+  {
+    avatar: 'https://bu.dusays.com/2024/10/25/671b2438203a6.gif',
+    name: 'Elykia',
+    title: 'Engineering Mechanics',
+    org: 'ZZU',
+    orgLink: 'https://www.zzu.edu.cn/',
+    desc: '致以无暇之人',
+    links: [
+      { icon: linkIcon, link: 'https://blog.elykia.cn' },
+      { icon: 'qq', link: 'elykia@qq.com' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/1451399239' },
+      { icon: 'github', link: 'https://github.com/elykia-cn' },
+    ]
+  },
+  {
+    avatar: 'https://www.lishoujie.cn/static/images/logo.png',
+    name: '大壮博客',
+    title: 'GoLang开发工程师',
+    org: '',
+    orgLink: '',
+    desc: '末日未来临，上帝不审人。',
+    links: [
+      { icon: linkIcon, link: 'https://www.lishoujie.cn' },
+    ]
+  },
+  {
+    avatar: 'https://blog.ctdxz.com/avatar.webp',
+    name: '吃土的小智',
+    title: '',
+    org: '',
+    orgLink: '',
+    desc: '我家还蛮大的.jpg',
+    links: [
+      { icon: linkIcon, link: 'https://blog.ctdxz.com' },
+      { icon: mailIcon, link: 'mailto:grtsinry43@outlook.com' },
+      { icon: 'qq', link: 'http://wpa.qq.com/msgrd?v=3&uin=3096484572&site=qq&menu=yes' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/476403407' },
+      { icon: 'neteasecloudmusic', link: 'https://space.bilibili.com/476403407' },
+      { icon: 'github', link: 'https://github.com/xiaozhi-6' },
+    ]
+  },
+  {
+    avatar: 'https://www.timochan.cn/api/objects/icon/9s6tbcvax674yv2m88.jpg',
+    name: 'TimochanのBlog',
+    title: '',
+    org: '',
+    orgLink: '',
+    desc: 'Let\'s start learning',
+    links: [
+      { icon: linkIcon, link: 'https://www.timochan.cn' },
+      { icon: mailIcon, link: 'mailto:i@timochan.cn' },
+      { icon: 'github', link: 'https://github.com/ttimochan' },
+      { icon: 'x', link: 'https://twitter.com/RefRebel' },
+      { icon: 'rss', link: 'https://www.timochan.cn/feed' },
+    ]
+  },
+  {
+    avatar: 'https://img.cdn1.vip/i/68bbdee513eb9_1757142757.webp',
+    name: 'LYEy_isine个人博客',
+    title: '',
+    org: '',
+    orgLink: '',
+    desc: '花海无一日,少年踏自来',
+    links: [
+      { icon: linkIcon, link: 'https://caiyifeng.top' },
+      { icon: mailIcon, link: 'mailto:caiyifeng0705@outlook.com' },
+      { icon: 'qq', link: 'https://qm.qq.com/q/Uz2Vg3uzC2' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/1358278810' },
+      { icon: 'steam', link: 'https://steamcommunity.com/id/LYEy_isine/' },
+      { icon: 'github', link: 'https://github.com/caiyifeng0705' },
+      { icon: 'rss', link: 'https://caiyifeng.top/rss.xml' },
+    ]
+  },
 ]
+/*
+  {
+    avatar: '',
+    name: '',
+    title: '',
+    org: '',
+    orgLink: '',
+    desc: '',
+    links: [
+      { icon: linkIcon, link: '' },
+    ]
+  },
+*/
 
 const templates = [
   {

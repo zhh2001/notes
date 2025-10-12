@@ -23,6 +23,9 @@ const GoNoteItems = [
   { text: 'Gin', link: '/go/gin' },
   { text: 'gRPC', link: '/go/grpc' }
 ]
+const DatabaseItems = [
+  { text: 'Redis', link: '/db/redis' }
+]
 const InterviewItems = [
   { text: 'GoLang', link: '/interview/go' }
 ]
@@ -73,6 +76,7 @@ const keywords = [
   'Goroutine',
   'GMP',
   'Gin',
+  'Database',
   'Redis',
   'MySQL',
   'protobuf',
@@ -146,6 +150,7 @@ export default defineConfig({
         items: [
           { text: 'SDN', items: SDNNoteItems },
           { text: 'Go', items: GoNoteItems },
+          { text: 'Database', items: DatabaseItems },
           { text: 'Interview', items: InterviewItems },
         ],
       },
@@ -170,11 +175,27 @@ export default defineConfig({
         }
       }
     },
-    sidebar: [
-      { text: 'SDN', link: '/sdn/', items: SDNNoteItems },
-      { text: 'Go', items: GoNoteItems },
-      { text: 'Interview', items: InterviewItems },
-    ],
+    sidebar: {
+      '/sdn/': [
+        { text: 'SDN', link: '/sdn/', items: SDNNoteItems },
+        { text: 'Go', items: GoNoteItems },
+      ],
+      '/go/': [
+        { text: 'Go', items: GoNoteItems },
+        { text: 'Database', items: DatabaseItems },
+        { text: 'Interview', items: InterviewItems },
+      ],
+      '/db/': [
+        { text: 'Go', items: GoNoteItems },
+        { text: 'Database', items: DatabaseItems },
+        { text: 'Interview', items: InterviewItems },
+      ],
+      '/interview/': [
+        { text: 'Go', items: GoNoteItems },
+        { text: 'Database', items: DatabaseItems },
+        { text: 'Interview', items: InterviewItems },
+      ],
+    },
     notFound: {
       code: '404',
       linkText: '返回首页',
