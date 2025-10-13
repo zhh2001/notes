@@ -123,7 +123,7 @@ export default defineConfig({
     math: true,
     languageAlias: {
       'p4': 'c++',
-      'pseudo': 'c++'
+      'pseudo': 'c++',
     }
   },
   themeConfig: {
