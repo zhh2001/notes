@@ -11,7 +11,7 @@ Redis 诞生于 2009 年，全称是 <span style="color:red;">Re</span>mote <spa
 ### 1.1 `KEYS`
 
 - 语法：`KEYS pattern`
-- 功能：查看复合模版的所有 `key`，不建议在生产环境使用
+- 功能：查看符合模版的所有 `key`，不建议在生产环境使用
 - 时间复杂度：`O(N)`，其中 `N` 是数据库中的键数
 
 ```txt
@@ -352,4 +352,335 @@ redis> LRANGE mylist 5 10
 (empty array)
 ```
 
-### 5.6 
+## 6 Set 类型
+
+Redis 的 Set 结构与 Java 中的 HashSet 类似，可以看作是一个 `value` 为 `null` 的 HashMap。因为也是一个 hash 表，因此具备与 HashSet 类似的特征：
+
+- 无序
+- 元素不重复
+- 查找快
+- 支持交集、并集、差集等功能
+
+### 6.1 `SADD`
+
+- 语法：`SADD key member [member ...]`
+- 功能：往集合中添加元素
+
+```txt
+redis> SADD myset "Hello" "World"
+(integer) 2
+redis> SADD myset "World"
+(integer) 0
+```
+
+### 6.2 `SREM`
+
+- 语法：`SREM key member [member ...]`
+- 功能：移除集合中的指定元素
+
+```txt
+redis> SADD myset "one" "two" "three"
+(integer) 3
+redis> SREM myset "one" "three"
+(integer) 2
+redis> SREM myset "four"
+(integer) 0
+```
+
+### 6.3 `SCARD`
+
+- 语法：`SCARD key`
+- 功能：返回集合中的元素数量
+
+```txt
+redis> SADD myset "one" "two" "three"
+(integer) 3
+redis> SCARD myset
+(integer) 3
+```
+
+### 6.4 `SISMEMBER`
+
+- 语法：`SISMEMBER key member`
+- 功能：判断元素是否在集合中
+
+```txt
+redis> SADD myset "one"
+(integer) 1
+redis> SISMEMBER myset "one"
+(integer) 1
+redis> SISMEMBER myset "two"
+(integer) 0
+```
+
+### 6.5 `SMEMBERS`
+
+- 语法：`SMEMBERS key`
+- 功能：获取集合中的全部元素
+
+```txt
+redis> SADD myset Hello World
+(integer) 2
+redis> SMEMBERS myset
+1) "Hello"
+2) "World"
+```
+
+### 6.6 `SINTER`
+
+- 语法：`SINTER key [key ...]`
+- 功能：求交集（intersection）
+
+```txt
+redis> SADD s1 a b c d
+(integer) 4
+redis> SADD s2 c
+(integer) 1
+redis> SADD s2 a c e
+(integer) 3
+redis> SINTER s1 s2 s3
+1) "c"
+```
+
+### 6.7 `SDIFF`
+
+- 语法：`SDIFF key [key ...]`
+- 功能：求差集（difference set）
+
+```txt
+redis> SADD s1 a b c d
+(integer) 4
+redis> SADD s2 c
+(integer) 1
+redis> SADD s2 a c e
+(integer) 3
+redis> SDIFF s1 s2 s3
+1) "d"
+2) "b"
+```
+
+### 6.8 `SUNION`
+
+- 语法：`SUNION key [key ...]`
+- 功能：求并集（union）
+
+```txt
+redis> SADD s1 a b c d
+(integer) 4
+redis> SADD s2 c
+(integer) 1
+redis> SADD s2 a c e
+(integer) 3
+redis> SUNION s1 s2 s3
+1) "c"
+2) "e"
+3) "b"
+4) "d"
+5) "a"
+```
+
+## 7 SortedSet 类型
+
+Redis 的 SortedSet 是一个可排序的集合，与 Java 中的 TreeSet 有些类似，但底层数据结构差别很大。SortedSet 中每个元素都带有一个 score 属性，可以基于 score 属性对元素排序，底层实现是一个跳表（SkipList）加 hash 表。
+
+SortedSet 具备下列特性：
+
+- 可排序
+- 元素不重复
+- 查询速度快
+
+因为 SortedSet 的可排序特性，经常被用来实现排行榜这样的功能。
+
+### 7.1 `ZADD`
+
+- 语法：`ZADD key [NX | XX] score member [score member ...]`
+- 功能：添加元素到有序集合，如果已存在则更新 `score`
+- 可选项：
+  - `XX`：仅更新已存在的元素。不添加新元素。
+  - `NX`：只添加新元素。不更新现有元素。
+
+```txt
+redis> ZADD myzset 1 one 1 uno 2 two 3 three
+(integer) 4
+```
+
+### 7.2 `ZREM`
+
+- 语法：`ZREM key member [member ...]`
+- 功能：删除有序集合中的指定元素
+
+```txt
+redis> ZADD myzset 1 one 1 uno 2 two 3 three
+(integer) 4
+redis> ZREM myzset two
+(integer) 1
+```
+
+### 7.3 `ZSCORE`
+
+- 语法：`ZSCORE key member`
+- 功能：查询指定元素的 `score`
+
+```txt
+redis> ZADD myzset 1 one
+(integer) 1
+redis> ZSCORE myzset one
+"1"
+```
+
+### 7.4 `ZRANK`
+
+- 语法：`ZRANK key member`
+- 功能：获取指定元素在有序集合中的排名
+
+```txt
+127.0.0.1:6379> ZADD z 1 one 2 two 3 three
+(integer) 3
+127.0.0.1:6379> ZRANK z three
+(integer) 2
+127.0.0.1:6379> ZRANK z four
+(nil)
+```
+
+### 7.5 `ZCARD`
+
+- 语法：`ZCARD key`
+- 功能：获取有序集合中的元素数量
+
+```txt
+127.0.0.1:6379> ZADD z 1 one 2 two 3 three
+(integer) 3
+127.0.0.1:6379> ZCARD z
+(integer) 3
+```
+
+### 7.6 `ZCOUNT`
+
+- 语法：`ZCOUNT key min max`
+- 功能：获取有序集合中的 `score` 在 `[min, max]` 内的元素数量
+
+```txt
+127.0.0.1:6379> ZADD z 1 one 2 two 3 three
+(integer) 3
+127.0.0.1:6379> ZCOUNT z -inf +inf
+(integer) 3
+127.0.0.1:6379> ZCOUNT z 2 3
+(integer) 2
+```
+
+### 7.7 `ZINCRBY`
+
+- 语法：`ZINCRBY key increment member`
+- 功能：让有序集合中指定元素的 `score` 自增，步长为 `increment`
+
+```txt
+redis> ZADD myzset 1 "one" 2 "two"
+(integer) 2
+redis> ZINCRBY myzset 2 "one"
+"3"
+```
+
+### 7.8 `ZRANGE`
+
+- 语法：`ZRANGE key start stop [BYSCORE | BYLEX] [REV] [WITHSCORES]`
+- 功能：按照 `score` 升序排序后，获取指定排名范围内的元素，排名从 0 开始
+- 参数：
+  - `REV`：是否降序顺序
+  - `WITHSCORES`：是否返回 `score`
+
+```txt
+127.0.0.1:6379> ZADD z 1 one 2 two 3 three
+(integer) 3
+127.0.0.1:6379> ZRANGE z 1 99
+1) "two"
+2) "three"
+127.0.0.1:6379> ZRANGE z 0 1 WITHSCORES
+1) "one"
+2) "1"
+3) "two"
+4) "2"
+```
+
+### 7.9 `ZRANGEBYSCORE`
+
+> 弃用，推荐 `ZRANGE`
+
+- 语法：`ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]`
+- 功能：按照 `score` 排序后，获取指定 `score` 范围内的元素
+
+### 7.10 `ZDIFF`
+
+- 语法：`ZDIFF numkeys key [key ...] [WITHSCORES]`
+- 功能：求差集（difference set）
+
+```txt
+redis> ZADD zset1 1 "one" 2 "two" 3 "three"
+(integer) 3
+redis> ZADD zset2 1 "one" 2 "two"
+(integer) 2
+redis> ZDIFF 2 zset1 zset2
+1) "three"
+redis> ZDIFF 2 zset1 zset2 WITHSCORES
+1) "three"
+2) "3"
+```
+
+### 7.11 `ZDIFF`
+
+- 语法：`ZDIFF numkeys key [key ...] [WITHSCORES]`
+- 功能：求差集（difference set）
+
+```txt
+redis> ZADD zset1 1 "one" 2 "two" 3 "three"
+(integer) 3
+redis> ZADD zset2 1 "one" 2 "two"
+(integer) 2
+redis> ZDIFF 2 zset1 zset2
+1) "three"
+redis> ZDIFF 2 zset1 zset2 WITHSCORES
+1) "three"
+2) "3"
+```
+
+### 7.12 `ZINTER`
+
+- 语法：`ZINTER numkeys key [key ...] [WITHSCORES]`
+- 功能：求交集（intersection）
+
+```txt
+redis> ZADD zset1 1 "one" 2 "two"
+(integer) 2
+redis> ZADD zset2 1 "one" 2 "two" 3 "three"
+(integer) 3
+redis> ZINTER 2 zset1 zset2
+1) "one"
+2) "two"
+redis> ZINTER 2 zset1 zset2 WITHSCORES
+1) "one"
+2) "2"
+3) "two"
+4) "4"
+```
+
+### 7.13 `ZUNION`
+
+- 语法：`ZUNION numkeys key [key ...] [WITHSCORES]`
+- 功能：求并集（union）
+
+```txt
+redis> ZADD zset1 1 "one" 2 "two"
+(integer) 2
+redis> ZADD zset2 1 "one" 2 "two" 3 "three"
+(integer) 3
+redis> ZUNION 2 zset1 zset2
+1) "one"
+2) "three"
+3) "two"
+redis> ZUNION 2 zset1 zset2 WITHSCORES
+1) "one"
+2) "2"
+3) "three"
+4) "3"
+5) "two"
+6) "4"
+```
