@@ -1,5 +1,5 @@
 ---
-outline: [2, 3]
+outline: [2, 4]
 ---
 
 # Redis
@@ -14,18 +14,18 @@ Redis 诞生于 2009 年，全称是 <span style="color:red;">Re</span>mote <spa
 - 功能：查看符合模版的所有 `key`，不建议在生产环境使用
 - 时间复杂度：`O(N)`，其中 `N` 是数据库中的键数
 
-```txt
-redis> MSET firstname Jack lastname Stuntman age 35
-"OK"
-redis> KEYS *name*
-1) "firstname"
-2) "lastname"
-redis> KEYS a??
-1) "age"
-redis> KEYS *
-1) "age"
-2) "firstname"
-3) "lastname"
+```bash
+MSET firstname Jack lastname Stuntman age 35
+# "OK"
+KEYS *name*
+# 1) "firstname"
+# 2) "lastname"
+KEYS a??
+# 1) "age"
+KEYS *
+# 1) "age"
+# 2) "firstname"
+# 3) "lastname"
 ```
 
 ### 1.2 `DEL`
@@ -33,13 +33,13 @@ redis> KEYS *
 - 语法：`DEL key [key ...]`
 - 功能：删除指定的 `key`，如果 `key` 不存在则忽略
 
-```txt
-redis> SET key1 "Hello"
-"OK"
-redis> SET key2 "World"
-"OK"
-redis> DEL key1 key2 key3
-(integer) 2
+```bash
+SET key1 "Hello"
+# "OK"
+SET key2 "World"
+# "OK"
+DEL key1 key2 key3
+# (integer) 2
 ```
 
 ### 1.3 `EXISTS`
@@ -47,17 +47,17 @@ redis> DEL key1 key2 key3
 - 语法：`EXISTS key [key ...]`
 - 功能：判断指定的 `key` 是否存在
 
-```txt
-redis> SET key1 "Hello"
-"OK"
-redis> EXISTS key1
-(integer) 1
-redis> EXISTS nosuchkey
-(integer) 0
-redis> SET key2 "World"
-"OK"
-redis> EXISTS key1 key2 nosuchkey
-(integer) 2
+```bash
+SET key1 "Hello"
+# "OK"
+EXISTS key1
+# (integer) 1
+EXISTS nosuchkey
+# (integer) 0
+SET key2 "World"
+# "OK"
+EXISTS key1 key2 nosuchkey
+# (integer) 2
 ```
 
 ### 1.4 `EXPIRE`
@@ -168,13 +168,13 @@ Hash 结构可以将对象中的每次字段独立存储，可以针对单个字
 - 语法：`HMSET key field value [field value ...]`
 - 功能：批量添加多个 hash 类型 `key` 的 `filed` 的值
 
-```txt
-redis> HMSET myhash field1 "Hello" field2 "World"
-"OK"
-redis> HGET myhash field1
-"Hello"
-redis> HGET myhash field2
-"World"
+```bash
+HMSET myhash field1 "Hello" field2 "World"
+# "OK"
+HGET myhash field1
+# "Hello"
+HGET myhash field2
+# "World"
 ```
 
 ### 4.4 `HMGET`
@@ -182,13 +182,13 @@ redis> HGET myhash field2
 - 语法：`HMGET key field [field ...]`
 - 功能：批量获取多个 hash 类型 `key` 的 `filed` 的值
 
-```txt
-redis> HSET myhash field1 "Hello" field2 "World"
-(integer) 2
-redis> HMGET myhash field1 field2 nofield
-1) "Hello"
-2) "World"
-3) (nil)
+```bash
+HSET myhash field1 "Hello" field2 "World"
+# (integer) 2
+HMGET myhash field1 field2 nofield
+# 1) "Hello"
+# 2) "World"
+# 3) (nil)
 ```
 
 ### 4.5 `HGETALL`
@@ -196,14 +196,14 @@ redis> HMGET myhash field1 field2 nofield
 - 语法：`HGETALL key`
 - 功能：获取一个 hash 类型的 `key` 中的所有 `filed` 和对应 `value`
 
-```txt
-redis> HSET myhash field1 "Hello" field2 "World"
-(integer) 2
-redis> HGETALL myhash
-1) "field1"
-2) "Hello"
-3) "field2"
-4) "World"
+```bash
+HSET myhash field1 "Hello" field2 "World"
+# (integer) 2
+HGETALL myhash
+# 1) "field1"
+# 2) "Hello"
+# 3) "field2"
+# 4) "World"
 ```
 
 ### 4.6 `HKEYS`
@@ -211,12 +211,12 @@ redis> HGETALL myhash
 - 语法：`HKEYS key`
 - 功能：获取一个 hash 类型的 `key` 中的所有的 `filed`
 
-```txt
-redis> HSET myhash field1 "Hello" field2 "World"
-(integer) 2
-redis> HKEYS myhash
-1) "field1"
-2) "field2"
+```bash
+HSET myhash field1 "Hello" field2 "World"
+# (integer) 2
+HKEYS myhash
+# 1) "field1"
+# 2) "field2"
 ```
 
 ### 4.7 `HVALS`
@@ -224,12 +224,12 @@ redis> HKEYS myhash
 - 语法：`HVALS key`
 - 功能：获取一个 hash 类型的 `key` 中的所有的 `value`
 
-```txt
-redis> HSET myhash field1 "Hello" field2 "World"
-(integer) 2
-redis> HVALS myhash
-1) "Hello"
-2) "World"
+```bash
+HSET myhash field1 "Hello" field2 "World"
+# (integer) 2
+HVALS myhash
+# 1) "Hello"
+# 2) "World"
 ```
 
 ### 4.8 `HINCRBY`
@@ -237,13 +237,13 @@ redis> HVALS myhash
 - 语法：`HINCRBY key field increment`
 - 功能：让一个 hash 类型的 `key` 的字段值增加指定步长
 
-```txt
-redis> HSET myhash field 5
-(integer) 1
-redis> HINCRBY myhash field 1
-(integer) 6
-redis> HINCRBY myhash field -10
-(integer) -4
+```bash
+HSET myhash field 5
+# (integer) 1
+HINCRBY myhash field 1
+# (integer) 6
+HINCRBY myhash field -10
+# (integer) -4
 ```
 
 ### 4.9 `HINCRBY`
@@ -251,13 +251,13 @@ redis> HINCRBY myhash field -10
 - 语法：`HINCRBY key field increment`
 - 功能：让一个 hash 类型的 `key` 的字段值增加指定步长
 
-```txt
-redis> HSET myhash field 5
-(integer) 1
-redis> HINCRBY myhash field 1
-(integer) 6
-redis> HINCRBY myhash field -10
-(integer) -4
+```bash
+HSET myhash field 5
+# (integer) 1
+HINCRBY myhash field 1
+# (integer) 6
+HINCRBY myhash field -10
+# (integer) -4
 ```
 
 ### 4.9 `HSETNX`
@@ -265,13 +265,13 @@ redis> HINCRBY myhash field -10
 - 语法：`HSETNX key field value`
 - 功能：只有这个 `key` 的字段不存在才能设置
 
-```txt
-redis> HSETNX myhash field "Hello"
-(integer) 1
-redis> HSETNX myhash field "World"
-(integer) 0
-redis> HGET myhash field
-"Hello"
+```bash
+HSETNX myhash field "Hello"
+# (integer) 1
+HSETNX myhash field "World"
+# (integer) 0
+HGET myhash field
+# "Hello"
 ```
 
 ## 5 List 类型
@@ -283,11 +283,11 @@ Redis 的 List 类型与 Java 的 LinkedList 类似，可以看作双向链表�
 - 语法：`LPUSH key element [element ...]`
 - 功能：向列表左侧插入元素，`key` 不存在则会创建
 
-```txt
-redis> LPUSH mylist "world"
-(integer) 1
-redis> LPUSH mylist "hello"
-(integer) 2
+```bash
+LPUSH mylist "world"
+# (integer) 1
+LPUSH mylist "hello"
+# (integer) 2
 ```
 
 ### 5.2 `RPUSH`
@@ -295,9 +295,9 @@ redis> LPUSH mylist "hello"
 - 语法：`RPUSH key element [element ...]`
 - 功能：向列表右侧插入元素，`key` 不存在则会创建
 
-```txt
-redis> RPUSH mylist "one" "two" "three" "four" "five"
-(integer) 5
+```bash
+RPUSH mylist "one" "two" "three" "four" "five"
+# (integer) 5
 ```
 
 ### 5.3 `LPOP`
@@ -305,14 +305,14 @@ redis> RPUSH mylist "one" "two" "three" "four" "five"
 - 语法：`LPOP key [count]`
 - 功能：从列表左侧移除元素
 
-```txt
-redis> RPUSH mylist "one" "two" "three" "four" "five"
-(integer) 5
-redis> LPOP mylist
-"one"
-redis> LPOP mylist 2
-1) "two"
-2) "three"
+```bash
+RPUSH mylist "one" "two" "three" "four" "five"
+# (integer) 5
+LPOP mylist
+# "one"
+LPOP mylist 2
+# 1) "two"
+# 2) "three"
 ```
 
 ### 5.4 `RPOP`
@@ -320,14 +320,14 @@ redis> LPOP mylist 2
 - 语法：`RPOP key [count]`
 - 功能：从列表右侧移除元素
 
-```txt
-redis> RPUSH mylist "one" "two" "three" "four" "five"
-(integer) 5
-redis> RPOP mylist
-"five"
-redis> RPOP mylist 2
-1) "four"
-2) "three"
+```bash
+RPUSH mylist "one" "two" "three" "four" "five"
+# (integer) 5
+RPOP mylist
+# "five"
+RPOP mylist 2
+# 1) "four"
+# 2) "three"
 ```
 
 ### 5.5 `LRANGE`
@@ -335,21 +335,21 @@ redis> RPOP mylist 2
 - 语法：`LRANGE key start stop`
 - 功能：返回索引在 `[start stop]` 内的所有元素
 
-```txt
-redis> RPUSH mylist "one" "two" "three"
-(integer) 3
-redis> LRANGE mylist 0 0
-1) "one"
-redis> LRANGE mylist -3 2
-1) "one"
-2) "two"
-3) "three"
-redis> LRANGE mylist -100 100
-1) "one"
-2) "two"
-3) "three"
-redis> LRANGE mylist 5 10
-(empty array)
+```bash
+RPUSH mylist "one" "two" "three"
+# (integer) 3
+LRANGE mylist 0 0
+# 1) "one"
+LRANGE mylist -3 2
+# 1) "one"
+# 2) "two"
+# 3) "three"
+LRANGE mylist -100 100
+# 1) "one"
+# 2) "two"
+# 3) "three"
+LRANGE mylist 5 10
+# (empty array)
 ```
 
 ## 6 Set 类型
@@ -366,11 +366,11 @@ Redis 的 Set 结构与 Java 中的 HashSet 类似，可以看作是一个 `valu
 - 语法：`SADD key member [member ...]`
 - 功能：往集合中添加元素
 
-```txt
-redis> SADD myset "Hello" "World"
-(integer) 2
-redis> SADD myset "World"
-(integer) 0
+```bash
+SADD myset "Hello" "World"
+# (integer) 2
+SADD myset "World"
+# (integer) 0
 ```
 
 ### 6.2 `SREM`
@@ -378,13 +378,13 @@ redis> SADD myset "World"
 - 语法：`SREM key member [member ...]`
 - 功能：移除集合中的指定元素
 
-```txt
-redis> SADD myset "one" "two" "three"
-(integer) 3
-redis> SREM myset "one" "three"
-(integer) 2
-redis> SREM myset "four"
-(integer) 0
+```bash
+SADD myset "one" "two" "three"
+# (integer) 3
+SREM myset "one" "three"
+# (integer) 2
+SREM myset "four"
+# (integer) 0
 ```
 
 ### 6.3 `SCARD`
@@ -392,11 +392,11 @@ redis> SREM myset "four"
 - 语法：`SCARD key`
 - 功能：返回集合中的元素数量
 
-```txt
-redis> SADD myset "one" "two" "three"
-(integer) 3
-redis> SCARD myset
-(integer) 3
+```bash
+SADD myset "one" "two" "three"
+# (integer) 3
+SCARD myset
+# (integer) 3
 ```
 
 ### 6.4 `SISMEMBER`
@@ -404,13 +404,13 @@ redis> SCARD myset
 - 语法：`SISMEMBER key member`
 - 功能：判断元素是否在集合中
 
-```txt
-redis> SADD myset "one"
-(integer) 1
-redis> SISMEMBER myset "one"
-(integer) 1
-redis> SISMEMBER myset "two"
-(integer) 0
+```bash
+SADD myset "one"
+# (integer) 1
+SISMEMBER myset "one"
+# (integer) 1
+SISMEMBER myset "two"
+# (integer) 0
 ```
 
 ### 6.5 `SMEMBERS`
@@ -418,12 +418,12 @@ redis> SISMEMBER myset "two"
 - 语法：`SMEMBERS key`
 - 功能：获取集合中的全部元素
 
-```txt
-redis> SADD myset Hello World
-(integer) 2
-redis> SMEMBERS myset
-1) "Hello"
-2) "World"
+```bash
+SADD myset Hello World
+# (integer) 2
+SMEMBERS myset
+# 1) "Hello"
+# 2) "World"
 ```
 
 ### 6.6 `SINTER`
@@ -431,15 +431,15 @@ redis> SMEMBERS myset
 - 语法：`SINTER key [key ...]`
 - 功能：求交集（intersection）
 
-```txt
-redis> SADD s1 a b c d
-(integer) 4
-redis> SADD s2 c
-(integer) 1
-redis> SADD s2 a c e
-(integer) 3
-redis> SINTER s1 s2 s3
-1) "c"
+```bash
+SADD s1 a b c d
+# (integer) 4
+SADD s2 c
+# (integer) 1
+SADD s2 a c e
+# (integer) 3
+SINTER s1 s2 s3
+# 1) "c"
 ```
 
 ### 6.7 `SDIFF`
@@ -447,16 +447,16 @@ redis> SINTER s1 s2 s3
 - 语法：`SDIFF key [key ...]`
 - 功能：求差集（difference set）
 
-```txt
-redis> SADD s1 a b c d
-(integer) 4
-redis> SADD s2 c
-(integer) 1
-redis> SADD s2 a c e
-(integer) 3
-redis> SDIFF s1 s2 s3
-1) "d"
-2) "b"
+```bash
+SADD s1 a b c d
+# (integer) 4
+SADD s2 c
+# (integer) 1
+SADD s2 a c e
+# (integer) 3
+SDIFF s1 s2 s3
+# 1) "d"
+# 2) "b"
 ```
 
 ### 6.8 `SUNION`
@@ -464,19 +464,19 @@ redis> SDIFF s1 s2 s3
 - 语法：`SUNION key [key ...]`
 - 功能：求并集（union）
 
-```txt
-redis> SADD s1 a b c d
-(integer) 4
-redis> SADD s2 c
-(integer) 1
-redis> SADD s2 a c e
-(integer) 3
-redis> SUNION s1 s2 s3
-1) "c"
-2) "e"
-3) "b"
-4) "d"
-5) "a"
+```bash
+SADD s1 a b c d
+# (integer) 4
+SADD s2 c
+# (integer) 1
+SADD s2 a c e
+# (integer) 3
+SUNION s1 s2 s3
+# 1) "c"
+# 2) "e"
+# 3) "b"
+# 4) "d"
+# 5) "a"
 ```
 
 ## 7 SortedSet 类型
@@ -499,9 +499,9 @@ SortedSet 具备下列特性：
   - `XX`：仅更新已存在的元素。不添加新元素。
   - `NX`：只添加新元素。不更新现有元素。
 
-```txt
-redis> ZADD myzset 1 one 1 uno 2 two 3 three
-(integer) 4
+```bash
+ZADD myzset 1 one 1 uno 2 two 3 three
+# (integer) 4
 ```
 
 ### 7.2 `ZREM`
@@ -509,11 +509,11 @@ redis> ZADD myzset 1 one 1 uno 2 two 3 three
 - 语法：`ZREM key member [member ...]`
 - 功能：删除有序集合中的指定元素
 
-```txt
-redis> ZADD myzset 1 one 1 uno 2 two 3 three
-(integer) 4
-redis> ZREM myzset two
-(integer) 1
+```bash
+ZADD myzset 1 one 1 uno 2 two 3 three
+# (integer) 4
+ZREM myzset two
+# (integer) 1
 ```
 
 ### 7.3 `ZSCORE`
@@ -521,11 +521,11 @@ redis> ZREM myzset two
 - 语法：`ZSCORE key member`
 - 功能：查询指定元素的 `score`
 
-```txt
-redis> ZADD myzset 1 one
-(integer) 1
-redis> ZSCORE myzset one
-"1"
+```bash
+ZADD myzset 1 one
+# (integer) 1
+ZSCORE myzset one
+# "1"
 ```
 
 ### 7.4 `ZRANK`
@@ -533,13 +533,13 @@ redis> ZSCORE myzset one
 - 语法：`ZRANK key member`
 - 功能：获取指定元素在有序集合中的排名
 
-```txt
-127.0.0.1:6379> ZADD z 1 one 2 two 3 three
-(integer) 3
-127.0.0.1:6379> ZRANK z three
-(integer) 2
-127.0.0.1:6379> ZRANK z four
-(nil)
+```bash
+ZADD z 1 one 2 two 3 three
+# (integer) 3
+ZRANK z three
+# (integer) 2
+ZRANK z four
+# (nil)
 ```
 
 ### 7.5 `ZCARD`
@@ -547,11 +547,11 @@ redis> ZSCORE myzset one
 - 语法：`ZCARD key`
 - 功能：获取有序集合中的元素数量
 
-```txt
-127.0.0.1:6379> ZADD z 1 one 2 two 3 three
-(integer) 3
-127.0.0.1:6379> ZCARD z
-(integer) 3
+```bash
+ZADD z 1 one 2 two 3 three
+# (integer) 3
+ZCARD z
+# (integer) 3
 ```
 
 ### 7.6 `ZCOUNT`
@@ -559,13 +559,13 @@ redis> ZSCORE myzset one
 - 语法：`ZCOUNT key min max`
 - 功能：获取有序集合中的 `score` 在 `[min, max]` 内的元素数量
 
-```txt
-127.0.0.1:6379> ZADD z 1 one 2 two 3 three
-(integer) 3
-127.0.0.1:6379> ZCOUNT z -inf +inf
-(integer) 3
-127.0.0.1:6379> ZCOUNT z 2 3
-(integer) 2
+```bash
+ZADD z 1 one 2 two 3 three
+# (integer) 3
+ZCOUNT z -inf +inf
+# (integer) 3
+ZCOUNT z 2 3
+# (integer) 2
 ```
 
 ### 7.7 `ZINCRBY`
@@ -573,11 +573,11 @@ redis> ZSCORE myzset one
 - 语法：`ZINCRBY key increment member`
 - 功能：让有序集合中指定元素的 `score` 自增，步长为 `increment`
 
-```txt
-redis> ZADD myzset 1 "one" 2 "two"
-(integer) 2
-redis> ZINCRBY myzset 2 "one"
-"3"
+```bash
+ZADD myzset 1 "one" 2 "two"
+# (integer) 2
+ZINCRBY myzset 2 "one"
+# "3"
 ```
 
 ### 7.8 `ZRANGE`
@@ -588,17 +588,17 @@ redis> ZINCRBY myzset 2 "one"
   - `REV`：是否降序顺序
   - `WITHSCORES`：是否返回 `score`
 
-```txt
-127.0.0.1:6379> ZADD z 1 one 2 two 3 three
-(integer) 3
-127.0.0.1:6379> ZRANGE z 1 99
-1) "two"
-2) "three"
-127.0.0.1:6379> ZRANGE z 0 1 WITHSCORES
-1) "one"
-2) "1"
-3) "two"
-4) "2"
+```bash
+ZADD z 1 one 2 two 3 three
+# (integer) 3
+ZRANGE z 1 99
+# 1) "two"
+# 2) "three"
+ZRANGE z 0 1 WITHSCORES
+# 1) "one"
+# 2) "1"
+# 3) "two"
+# 4) "2"
 ```
 
 ### 7.9 `ZRANGEBYSCORE`
@@ -613,16 +613,16 @@ redis> ZINCRBY myzset 2 "one"
 - 语法：`ZDIFF numkeys key [key ...] [WITHSCORES]`
 - 功能：求差集（difference set）
 
-```txt
-redis> ZADD zset1 1 "one" 2 "two" 3 "three"
-(integer) 3
-redis> ZADD zset2 1 "one" 2 "two"
-(integer) 2
-redis> ZDIFF 2 zset1 zset2
-1) "three"
-redis> ZDIFF 2 zset1 zset2 WITHSCORES
-1) "three"
-2) "3"
+```bash
+ZADD zset1 1 "one" 2 "two" 3 "three"
+# (integer) 3
+ZADD zset2 1 "one" 2 "two"
+# (integer) 2
+ZDIFF 2 zset1 zset2
+# 1) "three"
+ZDIFF 2 zset1 zset2 WITHSCORES
+# 1) "three"
+# 2) "3"
 ```
 
 ### 7.11 `ZDIFF`
@@ -630,16 +630,16 @@ redis> ZDIFF 2 zset1 zset2 WITHSCORES
 - 语法：`ZDIFF numkeys key [key ...] [WITHSCORES]`
 - 功能：求差集（difference set）
 
-```txt
-redis> ZADD zset1 1 "one" 2 "two" 3 "three"
-(integer) 3
-redis> ZADD zset2 1 "one" 2 "two"
-(integer) 2
-redis> ZDIFF 2 zset1 zset2
-1) "three"
-redis> ZDIFF 2 zset1 zset2 WITHSCORES
-1) "three"
-2) "3"
+```bash
+ZADD zset1 1 "one" 2 "two" 3 "three"
+# (integer) 3
+ZADD zset2 1 "one" 2 "two"
+# (integer) 2
+ZDIFF 2 zset1 zset2
+# 1) "three"
+ZDIFF 2 zset1 zset2 WITHSCORES
+# 1) "three"
+# 2) "3"
 ```
 
 ### 7.12 `ZINTER`
@@ -647,19 +647,19 @@ redis> ZDIFF 2 zset1 zset2 WITHSCORES
 - 语法：`ZINTER numkeys key [key ...] [WITHSCORES]`
 - 功能：求交集（intersection）
 
-```txt
-redis> ZADD zset1 1 "one" 2 "two"
-(integer) 2
-redis> ZADD zset2 1 "one" 2 "two" 3 "three"
-(integer) 3
-redis> ZINTER 2 zset1 zset2
-1) "one"
-2) "two"
-redis> ZINTER 2 zset1 zset2 WITHSCORES
-1) "one"
-2) "2"
-3) "two"
-4) "4"
+```bash
+ZADD zset1 1 "one" 2 "two"
+# (integer) 2
+ZADD zset2 1 "one" 2 "two" 3 "three"
+# (integer) 3
+ZINTER 2 zset1 zset2
+# 1) "one"
+# 2) "two"
+ZINTER 2 zset1 zset2 WITHSCORES
+# 1) "one"
+# 2) "2"
+# 3) "two"
+# 4) "4"
 ```
 
 ### 7.13 `ZUNION`
@@ -667,20 +667,173 @@ redis> ZINTER 2 zset1 zset2 WITHSCORES
 - 语法：`ZUNION numkeys key [key ...] [WITHSCORES]`
 - 功能：求并集（union）
 
-```txt
-redis> ZADD zset1 1 "one" 2 "two"
-(integer) 2
-redis> ZADD zset2 1 "one" 2 "two" 3 "three"
-(integer) 3
-redis> ZUNION 2 zset1 zset2
-1) "one"
-2) "three"
-3) "two"
-redis> ZUNION 2 zset1 zset2 WITHSCORES
-1) "one"
-2) "2"
-3) "three"
-4) "3"
-5) "two"
-6) "4"
+```bash
+ZADD zset1 1 "one" 2 "two"
+# (integer) 2
+ZADD zset2 1 "one" 2 "two" 3 "three"
+# (integer) 3
+ZUNION 2 zset1 zset2
+# 1) "one"
+# 2) "three"
+# 3) "two"
+ZUNION 2 zset1 zset2 WITHSCORES
+# 1) "one"
+# 2) "2"
+# 3) "three"
+# 4) "3"
+# 5) "two"
+# 6) "4"
 ```
+
+## 8 缓存穿透
+
+缓存穿透是指客户端请求的数据在缓存中和数据库中都不存在，这样缓存永远不会生效，这些请求都会打到数据库。
+
+常见的解决方案有两种：
+
+- 缓存空对象
+- 布隆过滤
+
+## 9 缓存雪崩
+
+缓存雪崩是指同一时段大量的缓存 key 同时失效或者 Redis 服务宕机，导致大量请求到达数据库，带来巨大压力。
+
+解决方案：
+- 给不同的 key 的 TTL 添加随机值
+- 利用 Redis 集群提高服务的可用性
+- 给缓存业务添加降级限流策略
+- 给业务添加多级缓存
+
+## 10 缓存击穿
+
+缓存击穿问题也叫热点Key问题，就是一个被高并发访问并且缓存重建业务比较复杂的 key 突然失效了，无数的请求访问会在瞬间给数据库带来巨大的冲击。
+
+解决方案：
+- 互斥锁
+- 逻辑过期
+
+## 11 执行脚本
+
+`EVAL` 命令：
+
+- 语法：`EVAL script numkeys [key [key ...]] [arg [arg ...]]]`
+- 功能：执行 Lua 脚本
+
+<<< @/db/codes/redis/eval.sh
+
+## 12 消息队列
+
+### 12.1 基于 List
+
+消息队列（Message Queue），字面意思就是存放消息的队列。而 Redis 的 List 数据结构是一个双向链表，很容易模拟出队列效果。
+
+队列是入口和出口不在同一边，因此我们可以利用：`LPUSH` 结合 `RPOP`、或者 `RPUSH` 结合 `LPOP` 来实现。
+
+不过要注意的是，当队列中没有消息时，`RPOP` 或 `LPOP` 操作会返回 `nil`，并不像 JVM 的阻塞队列那样会阻塞并等待消息。因此这里应该使用 `BRPOP` 或者 `BLPOP` 来实现阻塞效果。
+
+优点：
+
+- 利用 Redis 存储，不受限于 JVM 内存上限
+- 基于 Redis 的持久化机制，数据安全性有保证
+- 可以满足消息的有序性
+
+缺点：
+
+- 无法避免消息丢失
+- 只支持单消费者
+
+### 12.2 基于 PubSub
+
+PubSub（发布订阅）是 Redis 2.0 版本引入的消息传递模型。顾名思义，消费者可以订阅一个或多个 channel，生产者向对应 channel 发送消息后，所有订阅者都能收到相关消息。
+
+- `SUBSCRIBE channel [channel ...]`：订阅频道
+- `PUBLISH channel message`：向一个频道发送消息
+- `PSUBSCRIBE pattern [pattern ...]`：订阅与 `pattern` 格式匹配的所有频道
+
+优点：
+
+- 采用发布订阅模型，支持多生产、多消费
+
+缺点：
+
+- 不支持数据持久化
+- 无法避免消息丢失
+- 消息堆积有上限，超出时数据丢失
+
+### 12.3 基于 Stream
+
+Stream 是 Redis 5.0 引入的一种新数据类型，可以实现一个功能非常完善的消息队列。
+
+特点：
+
+- 消息可回溯
+- 一个消息可以被多个消费者读取
+- 可以阻塞读取
+
+#### 12.3.1 `XADD`
+
+- 语法：`XADD key [NOMKSTREAM] [KEEPREF | DELREF | ACKED] [<MAXLEN | MINID> [= | ~] threshold [LIMIT count]] <* | id> field value [field value ...]`
+- 功能：发送消息
+- 参数：
+  - `NOMKSTREAM`：如果队列不存在是否创建队列，默认创建。使用该参数表示不创建
+  - `<MAXLEN | MINID> [= | ~] threshold [LIMIT count]`：设置消息队列的最大消息数量
+  - `<* | id>`：消息的 ID，* 代表由 Redis 自动生成。格式是 `时间戳-递增数字`
+  - `field value`：发送到队列中的消息，称为 Entry。格式就是多个 key-value 键值对
+
+```bash
+## 创建名为 users 的队列，并向其中发送一个消息，并使用 Redis 自动生成 ID
+XADD users * name "zhh" age 18
+# "1760774662027-0"
+```
+
+#### 12.3.2 `XLEN`
+
+- 语法：`XLEN key`
+- 功能：返回 Stream 中消息条目的数量
+
+<<< @/db/codes/redis/xlen.sh
+
+#### 12.3.3 `XREAD`
+
+- 语法：`XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] id [id ...]`
+- 功能：读取消息
+- 参数：
+  - `COUNT count`：每次读取消息的最大数量
+  - `BLOCK milliseconds`：当没有消息时是否阻塞
+  - `STREAMS key [key ...]`：要从哪个队列读消息，`key` 就是队列名
+  - `id [id ...]`：起始 ID，只返回大于该 ID 的消息
+    - `0`：代表从第一个消息开始
+    - `$`：代表从最新消息开始
+
+<<< @/db/codes/redis/xread.sh
+
+### 12.4 Stream-消费者组
+
+将多个消费者划分到一个组中，监听同一个队列。具备下列特点：
+
+1. 消息分流：队列中的消息会分流给组内的不同消费者，而不是重复消费，从而加快消息处理的速度
+2. 消息标识：消费者组会维护一个表示，记录最后一个被处理的消息，哪怕消费者宕机重启，还会从标识之后读取消息。确保每个消息都被消费
+3. 消息确认：消费者获取消息后，消息处于 pending 状态，并存入一个 pending-list。当处理完成后需要通过 XACK 来确认消息，标记消息为已处理，才会从 pending-list 移除
+
+#### 12.4.1 `XGROUP CREATE`
+
+- 语法：`XGROUP CREATE key group <id | $> [MKSTREAM] [ENTRIESREAD entries-read]`
+- 功能：创建消费者组
+- 参数：
+  - `key`：队列名称
+  - `group`：消费者组名称
+  - `<id | $>`：起始 ID 标识
+  - `MKSTREAM`：不存在时自动创建
+
+#### 12.4.2 `XGROUP DESTROY`
+
+- 语法：`XGROUP DESTROY key group`
+- 功能：删除消费者组
+
+#### 12.4.3 `XREADGROUP GROUP`
+
+- 语法：`XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREAMS key [key ...] id [id ...]`
+- 功能：从消费者组读取消息
+- 参数：
+  - `group`：消费者组名称
+  - `consumer`：消费者名称，如果不存在则自动创建
