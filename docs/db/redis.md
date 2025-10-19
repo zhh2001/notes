@@ -891,3 +891,42 @@ GEO 是 Geolocation 的简写形式，代表地理坐标。Redis 在 3.2 版本�
 
 - 语法：`GEOSEARCHSTORE destination source <FROMMEMBER member | FROMLONLAT longitude latitude> <BYRADIUS radius <M | KM | FT | MI> | BYBOX width height <M | KM | FT | MI>> [ASC | DESC] [COUNT count [ANY]] [STOREDIST]`
 - 功能：与 `GEOSEARCH` 功能一致，不过可以把结果存到一个指定的 `key`
+
+## 14 Bitmap
+
+Redis 中是利用 string 类型数据结构实现 Bitmap，因此最大上限是 512 M。
+
+### 14.1 `SETBIT`
+
+- 语法：`SETBIT key offset value`
+- 功能：在 `offset` 处存入一个 `1` 或 `0`
+
+<<< @/db/codes/redis/setbit.sh
+
+### 14.2 `GETBIT`
+
+- 语法：`GETBIT key offset`
+- 功能：在 `offset` 处存入一个 `1` 或 `0`
+
+<<< @/db/codes/redis/getbit.sh{3-6}
+
+### 14.3 `BITFIELD`
+
+- 语法：`BITFIELD key GET encoding offset`
+- 功能：查询 Bitmap 中 bit 数组指定位置的值
+
+<<< @/db/codes/redis/bitfield.sh
+
+### 14.4 `BITCOUNT`
+
+- 语法：`BITCOUNT key`
+- 功能：统计 Bitmap 中值为 `1` 的 bit 位的数量
+
+<<< @/db/codes/redis/bitcount.sh
+
+### 14.5 `BITPOS`
+
+- 语法：`BITPOS key bit [start [end [BYTE | BIT]]]`
+- 功能：查询 bit 数组中指定范围内第一个 0 或 1 出现的位置
+
+<<< @/db/codes/redis/bitpos.sh
