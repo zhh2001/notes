@@ -837,3 +837,57 @@ XADD users * name "zhh" age 18
 - 参数：
   - `group`：消费者组名称
   - `consumer`：消费者名称，如果不存在则自动创建
+
+## 13 GEO
+
+GEO 是 Geolocation 的简写形式，代表地理坐标。Redis 在 3.2 版本中加入了对 GEO 的支持，允许存储地理坐标信息，帮助我们根据经纬度来检索数据。
+
+### 13.1 `GEOADD`
+
+- 语法：`GEOADD key [NX | XX] longitude latitude member [longitude latitude member ...]`
+- 功能：添加一个地理空间信息
+
+<<< @/db/codes/redis/geoadd.sh
+
+### 13.2 `GEODIST`
+
+- 语法：`GEODIST key member1 member2 [M | KM]`
+- 功能：返回两个点之间的距离
+- 参数：
+  - `M`：以米为单位
+  - `KM`：以千米为单位
+
+<<< @/db/codes/redis/geodist.sh{10-15}
+
+### 13.3 `GEOHASH`
+
+- 语法：`GEOHASH key [member [member ...]]`
+- 功能：返回 hash 字符串形式的 `member` 坐标
+
+<<< @/db/codes/redis/geohash.sh{5,6}
+
+### 13.4 `GEOPOS`
+
+- 语法：`GEOPOS key [member [member ...]]`
+- 功能：返回 `member` 的坐标
+
+<<< @/db/codes/redis/geopos.sh{5-7}
+
+### 13.5 `GEORADIUS`
+
+> 废弃。推荐采用 `GEOSEARCH` 和 `GEOSEARCHSTORE`
+
+- 语法：`GEORADIUS key longitude latitude radius <M | KM | FT | MI>`
+- 功能：指定圆心、半径，找到该圆内包含的所有 `member`
+
+### 13.6 `GEOSEARCH`
+
+- 语法：`GEOSEARCH key <FROMMEMBER member | FROMLONLAT longitude latitude> <BYRADIUS radius <M | KM | FT | MI> | BYBOX width height <M | KM | FT | MI>> [ASC | DESC] [COUNT count [ANY]] [WITHCOORD] [WITHDIST] [WITHHASH]`
+- 功能：在指定范围内搜索 `member`，并按照与指定点的距离排序后返回。范围可以是圆形或矩形
+
+<<< @/db/codes/redis/geosearch.sh{10-19}
+
+### 13.6 `GEOSEARCHSTORE`
+
+- 语法：`GEOSEARCHSTORE destination source <FROMMEMBER member | FROMLONLAT longitude latitude> <BYRADIUS radius <M | KM | FT | MI> | BYBOX width height <M | KM | FT | MI>> [ASC | DESC] [COUNT count [ANY]] [STOREDIST]`
+- 功能：与 `GEOSEARCH` 功能一致，不过可以把结果存到一个指定的 `key`
