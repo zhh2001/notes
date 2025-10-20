@@ -61,6 +61,17 @@ const members = [
     ]
   },
   {
+    avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3188468169&s=640',
+    name: '墨希MoXiify',
+    desc: '做一条，逆流的鱼',
+    links: [
+      { icon: linkIcon, link: 'https://note.moxiify.cn' },
+      { icon: 'qq', link: 'mailto:3188468169@qq.com' },
+      { icon: 'github', link: 'https://github.com/MoXiaoXi233' },
+      { icon: 'rss', link: 'https://note.moxiify.cn/feed/' },
+    ]
+  },
+  {
     avatar: 'https://hzz.cool/favicon.ico',
     name: '何智政个人博客',
     desc: '择善固执 守正出奇',
@@ -71,6 +82,18 @@ const members = [
       { icon: 'instagram', link: 'https://www.instagram.com/dexter_ho_cn' },
       { icon: 'telegram', link: 'https://t.me/dexterho' },
       { icon: 'sinaweibo', link: 'https://weibo.com/u/5675317400' },
+    ]
+  },
+  {
+    avatar: 'https://blog.feng1026.top/avatar.jpg',
+    name: '枫落丰源',
+    desc: '和你的日常，就是奇迹',
+    links: [
+      { icon: linkIcon, link: 'https://blog.feng1026.top' },
+      { icon: mailIcon, link: 'mailto:qiufengluoye@feng1026.top' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/1735270180' },
+      { icon: 'steam', link: 'https://steamcommunity.com/id/qiufengluoye44/' },
+      { icon: 'github', link: 'https://github.com/Qiufengluoyes' },
     ]
   },
   {
