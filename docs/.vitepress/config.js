@@ -37,6 +37,7 @@ const TechNotes = [
   {
     text: 'Database',
     items: [
+      { text: 'MySQL', link: '/db/mysql' },
       { text: 'Redis', link: '/db/redis' },
     ]
   },
