@@ -175,14 +175,26 @@ outline: [2, 3]
 
 | 常见函数 | 功能     |
 | -------- | -------- |
-| `count`  | 统计数量 |
-| `max`    | 最大值   |
-| `min`    | 最小值   |
-| `avg`    | 平均值   |
+| `COUNT`  | 统计数量 |
+| `MAX`    | 最大值   |
+| `MIN`    | 最小值   |
+| `AVG`    | 平均值   |
 | `SUM`    | 求和     |
 
 <<< @/db/codes/mysql/dql_agg.sql
 
 `NULL` 值不参与聚合运算。
+
+#### 1.3.4 分组查询
+
+<<< @/db/codes/mysql/dql_group.sql
+
+#### 1.3.5 排序查询
+
+<<< @/db/codes/mysql/dql_order.sql
+
+#### 1.3.6 分页查询
+
+<<< @/db/codes/mysql/dql_limit.sql
 
 ### 1.4 DCL
