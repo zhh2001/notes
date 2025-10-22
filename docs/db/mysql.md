@@ -198,3 +198,46 @@ outline: [2, 3]
 <<< @/db/codes/mysql/dql_limit.sql
 
 ### 1.4 DCL
+
+#### 1.4.1 用户管理
+
+- 查询用户
+
+<<< @/db/codes/mysql/dcl_select_user.sql
+
+- 创建用户
+
+<<< @/db/codes/mysql/dcl_create_user.sql
+
+- 修改用户密码
+
+<<< @/db/codes/mysql/dcl_change_pwd.sql
+
+- 删除用户
+
+<<< @/db/codes/mysql/dcl_drop_user.sql
+
+#### 1.4.2 权限控制
+
+| 常用权限                | 说明               |
+| ----------------------- | ------------------ |
+| `ALL`，`ALL PRIVILEGES` | 所有权限           |
+| `SELECT`                | 查询数据           |
+| `INSERT`                | 插入数据           |
+| `UPDATE`                | 修改数据           |
+| `DELETE`                | 删除数据           |
+| `ALTER`                 | 修改表             |
+| `DROP`                  | 删除数据库/表/视图 |
+| `CREATE`                | 创建数据库/表      |
+
+- 查询权限
+
+<<< @/db/codes/mysql/dcl_show_grants.sql
+
+- 授予权限
+
+<<< @/db/codes/mysql/dcl_grant.sql
+
+- 撤销权限
+
+<<< @/db/codes/mysql/dcl_revoke.sql
