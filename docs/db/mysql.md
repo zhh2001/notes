@@ -310,3 +310,162 @@ outline: [2, 3]
 | 外键约束 | `FOREIGN KEY` | 用来让两张表的数据之间建立连接，保证数据的一致性和完整性 |
 
 <<< @/db/codes/mysql/constraint.sql
+
+外键用来让两张表的数据之间建立连接，从而保证数据的的一致性和完整性。
+
+- 添加外键
+
+方式一：
+
+<<< @/db/codes/mysql/foreign_key_1.sql
+
+方式二：
+
+<<< @/db/codes/mysql/foreign_key_2.sql
+
+外键的删除/更新行为：
+
+| 行为          | 说明                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `NO ACTION`   | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新。（与 `RESTRICT` 一致）               |
+| `RESTRICT`    | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新。（与 `NO ACTION` 一致）              |
+| `CASCADE`     | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则也删除/更新外键在子表中的记录。                       |
+| `SET NULL`    | 当在父表中删除对应记录时，首先检查该记录是否有对应外键，如果有则设置子表中该外键值为 `NULL`。（这个字段需要允许为 `NULL`） |
+| `SET DEFAULT` | 父表有变更时，子表将外键列设置成一个默认的值。（Innodb 不支持）                                                            |
+
+<<< @/db/codes/mysql/foreign_key_action.sql
+
+## 4 多表查询
+
+### 4.1 内连接
+
+- 隐式内连接
+
+<<< @/db/codes/mysql/join_inner_where.sql
+
+- 显示内连接
+
+<<< @/db/codes/mysql/join_inner_on.sql
+
+### 4.2 外连接
+
+- 左外连接
+
+<<< @/db/codes/mysql/join_left.sql
+
+- 右外连接
+
+<<< @/db/codes/mysql/join_right.sql
+
+### 4.3 自连接
+
+自连接查询可以是内连接，也可以是外连接。
+
+<<< @/db/codes/mysql/join_self.sql
+
+### 4.4 联合查询
+
+关键字：
+
+- `UNION ALL`：直接合并
+- `UNION`：去重合并
+
+<<< @/db/codes/mysql/join_union.sql
+
+### 4.5 子查询
+
+SQL 语句中嵌套 `SELECT` 语句，成为嵌套查询，又称子查询。
+
+#### 4.5.1 标量子查询
+
+子查询返回的结果是单个值（数字、字符串、日期等），这种子查询成为标量子查询。
+
+<<< @/db/codes/mysql/subquery_scalar.sql
+
+#### 4.5.2 列子查询
+
+子查询返回的结果是一列，这种子查询成为列子查询。
+
+<<< @/db/codes/mysql/subquery_column.sql
+
+#### 4.5.3 行子查询
+
+子查询返回的结果是一行，这种子查询成为行子查询。
+
+<<< @/db/codes/mysql/subquery_row.sql
+
+#### 4.5.4 表子查询
+
+子查询返回的结果是多行多列，这种子查询成为表子查询。
+
+<<< @/db/codes/mysql/subquery_table.sql
+
+## 5 事务
+
+事务是一组操作的集合，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向操作系统提交或撤销操作请求，即这些操作要么同时成功，要么同时失败。
+
+默认 MySQL 的事务是自动提交的，当执行一条 DML 语句，MySQL 会立即隐式地提交事务。
+
+- 查看/设置事务的提交方式
+
+<<< @/db/codes/mysql/transaction_auto_commit.sql
+
+- 提交事务
+
+<<< @/db/codes/mysql/transaction_commit.sql
+
+- 回滚事务
+
+<<< @/db/codes/mysql/transaction_rollback.sql
+
+### 5.1 事务操作
+
+- 开启事务
+
+<<< @/db/codes/mysql/transaction_start.sql
+
+或：
+
+<<< @/db/codes/mysql/transaction_begin.sql
+
+- 提交事务
+
+<<< @/db/codes/mysql/transaction_commit.sql
+
+- 回滚事务
+
+<<< @/db/codes/mysql/transaction_rollback.sql
+
+### 5.2 四大特性 ACID
+
+- 原子性（<span style="color:red;">A</span>tomicity）：事务是不可分割的最小操作单元，要么全部成功，要么全部失败。
+- 一致性（<span style="color:red;">C</span>onsistency）：事务完成时，必须使所有的数据都保持一致状态。
+- 隔离性（<span style="color:red;">I</span>solation）：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下进行。
+- 持久性（<span style="color:red;">D</span>urability）：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。
+
+### 5.3 并发事务问题
+
+| 问题       | 描述                                                         |
+| ---------- | ------------------------------------------------------------ |
+| 脏读       | 一个事务读取了另一个事务尚未提交的修改数据                   |
+| 不可重复读 | 同一事务内，多次读取同一数据，但结果不一致                   |
+| 幻读       | 同一事务内，多次执行相同的查询条件，但返回的结果集行数不一致 |
+
+### 5.4 事务隔离级别
+
+| 隔离级别                | 脏读 | 不可重复读 | 幻读 |
+| ----------------------- | :--: | :--------: | :--: |
+| Read uncommitted        |  √   |     √      |  √   |
+| Read committed          |  ×   |     √      |  √   |
+| Repeatable Read（默认） |  ×   |     ×      |  √   |
+| Serializable            |  ×   |     ×      |  ×   |
+
+- 查看事务隔离级别
+
+<<< @/db/codes/mysql/transaction_isolation_select.sql
+
+- 设置事务隔离级别
+
+<<< @/db/codes/mysql/transaction_isolation_set.sql
+
+`SESSION` 表示当前会话，`GLOBAL` 表示全局。
