@@ -241,3 +241,72 @@ outline: [2, 3]
 - 撤销权限
 
 <<< @/db/codes/mysql/dcl_revoke.sql
+
+## 2 函数
+
+### 2.1 字符串函数
+
+| 常用函数                     | 说明                                                          |
+| ---------------------------- | ------------------------------------------------------------- |
+| `CONCAT(S1, S2, ..., Sn)`    | 字符串拼接                                                    |
+| `LOWER(str)`                 | 将字符串全部转为小写                                          |
+| `UPPER(str)`                 | 将字符串全部转为大写                                          |
+| `LPAD(str, n, pad)`          | 左填充，用 `pad` 对 `str` 左边进行填充，达到 `n` 个字符串长度 |
+| `RPAD(str, n, pad)`          | 右填充，用 `pad` 对 `str` 右边进行填充，达到 `n` 个字符串长度 |
+| `TRIM(str)`                  | 去掉字符串头部和尾部的空格                                    |
+| `SUBSTRING(str, start, len)` | 返回字符串 `str` 从 `start` 位置起的 `len` 个长度的子字符串   |
+
+<<< @/db/codes/mysql/func_string.sql
+
+### 2.2 数值函数
+
+| 常用函数      | 说明                                   |
+| ------------- | -------------------------------------- |
+| `CEIL(x)`     | 向上取整                               |
+| `FLOOR(x)`    | 向下取整                               |
+| `MOD(x, y)`   | 返回 `x % y`                           |
+| `RAND()`      | 返回 `0~1` 的随机数                    |
+| `ROUND(x, y)` | 返回 `x` 的四舍五入值，保留 `y` 位小数 |
+
+<<< @/db/codes/mysql/func_math.sql
+
+### 2.3 日期函数
+
+| 常用函数                             | 说明 |
+| ------------------------------------ | ---- |
+| `CURDATE()`                          |      |
+| `CURTIME()`                          |      |
+| `NOW()`                              |      |
+| `YEAR(date)`                         |      |
+| `MONTH(date)`                        |      |
+| `DAY(date)`                          |      |
+| `DATE_ADD(date, INTERVAL expr type)` |      |
+| `DATEDIFF(date1, date2)`             |      |
+
+<<< @/db/codes/mysql/func_date.sql
+
+### 2.4 流程函数
+
+| 常用函数                                                     | 说明                                                                   |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `IF(value, t, f)`                                            | 如果 `value` 为 `true`，则返回 `t`，否则返回 `f`                       |
+| `IFNULL(value1, value2)`                                     | 如果 `value1` 不为 `NULL`，返回 `value1`，否则返回 `value2`            |
+| `CASE WHEN [val1] THEN [res1] ... ELSE [default] END`        | 如果 `val1` 为 `true`，返回 `res1`，...，否则返回 `default` 默认值     |
+| `CASE [expr] WHEN [val1] THEN [res1] ... ELSE [default] END` | 如果 `expr` 的值为 `val1`，返回 `res1`，...，否则返回 `default` 默认值 |
+
+<<< @/db/codes/mysql/func_flow.sql
+
+## 3 约束
+
+约束是作用于表中字段上的规则，用于限制存储在表中的数据。
+
+| 约束     | 关键字        | 描述                                                     |
+| -------- | ------------- | -------------------------------------------------------- |
+| 非空约束 | `NOT NULL`    | 限制该字段数据不能为 `NULL`                              |
+| 唯一约束 | `UNIQUE`      | 保证该字段数据唯一、不重复                               |
+| 主键约束 | `PRIMARY KEY` | 主键是一行数据的唯一标识，要求非空且唯一                 |
+| 默认约束 | `DEFAULT`     | 保存数据时，如果未指定该字段的值，则采用默认值           |
+| 检查约束 | `CHECK`       | 保证字段值满足一个条件                                   |
+| 外键约束 | `FOREIGN KEY` | 用来让两张表的数据之间建立连接，保证数据的一致性和完整性 |
+
+<<< @/db/codes/mysql/constraint.sql
