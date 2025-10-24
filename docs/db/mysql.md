@@ -469,3 +469,131 @@ SQL 语句中嵌套 `SELECT` 语句，成为嵌套查询，又称子查询。
 <<< @/db/codes/mysql/transaction_isolation_set.sql
 
 `SESSION` 表示当前会话，`GLOBAL` 表示全局。
+
+## 6 存储引擎
+
+- 查询当前数据库支持的存储引擎
+
+<<< @/db/codes/mysql/engine_show.sql
+
+|       Engine       | Support | Comment                                                        | Transactions |  XA  | Savepoints |
+| :----------------: | :-----: | -------------------------------------------------------------- | :----------: | :--: | :--------: |
+|      ARCHIVE       |   YES   | Archive storage engine                                         |      NO      |  NO  |     NO     |
+|     BLACKHOLE      |   YES   | /dev/null storage engine (anything you write to it disappears) |      NO      |  NO  |     NO     |
+|     MRG_MYISAM     |   YES   | Collection of identical MyISAM tables                          |      NO      |  NO  |     NO     |
+|     FEDERATED      |   NO    | Federated MySQL storage engine                                 |     NULL     | NULL |    NULL    |
+|       MyISAM       |   YES   | MyISAM storage engine                                          |      NO      |  NO  |     NO     |
+| PERFORMANCE_SCHEMA |   YES   | Performance Schema                                             |      NO      |  NO  |     NO     |
+|       InnoDB       | DEFAULT | Supports transactions, row-level locking, and foreign keys     |     YES      | YES  |    YES     |
+|       MEMORY       |   YES   | Hash based, stored in memory, useful for temporary tables      |      NO      |  NO  |     NO     |
+|        CSV         |   YES   | CSV storage engine                                             |      NO      |  NO  |     NO     |
+
+- 在创建表时指定存储引擎
+
+<<< @/db/codes/mysql/engine_create_table.sql
+
+### 6.1 InnoDB
+
+InnoDB 是一种兼顾高可靠性和高性能的通用存储引擎，在 MySQL 5.5 之后，InnoDB 是 MySQL 默认的存储引擎。
+
+特点：
+
+- DML 操作遵循 ACID 模型，支持事务
+- 行级锁，提高并发访问性能
+- 支持外键 `FOREIGN KEY` 约束，保证数据的完整性和一致性
+
+文件：每个 InnoDB 引擎的表都会对应一个表空间文件 `tb_name.ibd`，存储该表的表结构（frm、sdi）、数据和索引。
+
+`.ibd` 文件存在的前提是启用了独立表空间（默认启用），可通过以下命令确认：
+
+<<< @/db/codes/mysql/engine_var_idb.sql
+
+Ubuntu 的 `.ibd` 文件默认放在 `/var/lib/mysql/数据库名` 路径下。
+
+例如，我的 `test` 数据库下有两张使用 InnoDB 引擎的表 `tb_user`、`tb_account`。
+
+那么在 `/var/lib/mysql/test` 路径下，就会存在 `tb_user.ibd`、`tb_account.ibd` 两个文件。
+
+`.ibd` 文件是二进制文件，无法直接打开，需要使用命令 `ibd2sdi 表名.ibd` 才能查看。
+
+逻辑存储结构：
+
+1. Tablespace：表空间，一个表空间包含多个段
+2. Segment：段，一个段包含多个区
+3. Extend：区，一个区大小为 1 M，包含多个页（64 个页）
+4. Page：页，一个页大小为 16 K，包含多个行
+5. Row：行
+
+### 6.2 MyISAM
+
+MyISAM 是 MySQL 早期的默认存储引擎。
+
+特点：
+
+- 不支持事务，不支持外键
+- 支持表锁，不支持行锁
+- 访问速度快
+
+文件：
+
+- `tb_name.sdi`：存储表结构信息
+- `tb_name.MYD`：存储数据
+- `tb_name.MYI`：存储索引
+
+### 6.3 MEMORY
+
+Memory 引擎的表数据存储在内存中，由于收到硬件问题或断电问题的影响，只能将这些表作为临时表或缓存使用。
+
+特点：
+
+- 内存存放
+- Hash 索引（默认）
+
+文件：`tb_name.sdi` 存储表结构信息。
+
+### 6.4 对比
+
+|   特点    | InnoDB | MyISAM | MEMORY |
+| :-------: | :----: | :----: | :----: |
+|   事务    |  支持  |   -    |   -    |
+|   外键    |  支持  |   -    |   -    |
+|  锁机制   |  行锁  |  表锁  |  表锁  |
+| B+ 树索引 |  支持  |  支持  |  支持  |
+| Hash 索引 |   -    |   -    |  支持  |
+
+## 7 索引
+
+### 7.1 结构
+
+MySQL 采用 B+ 树作为索引。
+
+| 特性             | B 树                                | B+ 树                                         |
+| ---------------- | ----------------------------------- | --------------------------------------------- |
+| **存储内容**     | 非叶子节点和叶子节点均存储键+值     | 仅叶子节点存储键+值，非叶子节点仅存键（索引） |
+| **叶子节点**     | 孤立存在，无链接                    | 所有叶子节点通过双向链表连接                  |
+| **查询效率**     | 随机查询可能更快（找到键即可返回）  | 随机查询略慢（必须遍历到叶子节点）            |
+| **范围查询**     | 需回溯父节点，效率低                | 利用叶子节点链表，一次遍历完成，效率高        |
+| **节点存储密度** | 低（键+值占用空间大，单节点键数少） | 高（非叶子节点仅存键，单节点键数更多）        |
+| **IO 次数**      | 较多（层级可能更深）                | 较少（层级更浅，因单节点键数多）              |
+| **数据冗余**     | 无冗余（键仅出现一次）              | 有冗余（非叶子节点的键是叶子节点的副本）      |
+
+### 7.2 分类
+
+| 分类         | 含义                                                 | 特点                     | 关键字     |
+| ------------ | ---------------------------------------------------- | ------------------------ | ---------- |
+| **主键索引** | 针对于表中主键创建的索引                             | 默认自动创建, 只能有一个 | `PRIMARY`  |
+| **唯一索引** | 避免同一个表中某数据列中的值重复                     | 可以有多个               | `UNIQUE`   |
+| **常规索引** | 快速定位特定数据                                     | 可以有多个               |            |
+| **全文索引** | 全文索引查找的是文本中的关键词，而不是比较索引中的值 | 可以有多个               | `FULLTEXT` |
+
+在 InnoDB 存储引擎中，根据索引的存储形式，又可以分为以下两种：
+
+| 分类                            | 含义                                                       | 特点                 |
+| ------------------------------- | ---------------------------------------------------------- | -------------------- |
+| **聚簇索引（Clustered Index）** | 将数据存储和索引放到了一块，索引结构的叶子节点保存了行数据 | 必须要，而且只有一个 |
+| **二级索引（Secondary Index）** | 将数据与所有分开存储，索引结构的叶子节点关联的是对应的主键 | 可以存在多个         |
+
+聚簇索引选取规则：
+- 如果存在主键，主键索引就是聚簇索引
+- 如果不存在主键，将使用第一个唯一索引作为聚簇索引
+- 如果表没有主键和唯一索引，则 InnoDB 会自动生成一个 `rowid` 作为隐藏的聚簇索引
