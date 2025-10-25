@@ -13,3 +13,10 @@
 <<< @/interview/code/mysql/table_lookup.sql
 
 通过 `id` 更快，因为通过 `name` 需要回表查询。
+
+### 1.3 对以下 SQL 语句进行优化
+
+<<< @/interview/code/mysql/covering_index.sql
+
+- 方案一：针对 `name` 字段建立索引，但是需要回表查询
+- 方案二：针对 `name`、`age` 两个字段建立联合索引，无需回表查询

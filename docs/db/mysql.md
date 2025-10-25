@@ -597,3 +597,146 @@ MySQL 采用 B+ 树作为索引。
 - 如果存在主键，主键索引就是聚簇索引
 - 如果不存在主键，将使用第一个唯一索引作为聚簇索引
 - 如果表没有主键和唯一索引，则 InnoDB 会自动生成一个 `rowid` 作为隐藏的聚簇索引
+
+### 7.3 语法
+
+- 创建索引
+
+<<< @/db/codes/mysql/index_create.sql
+
+- 查看索引
+
+<<< @/db/codes/mysql/index_show.sql
+
+- 删除索引
+
+<<< @/db/codes/mysql/index_drop.sql
+
+### 7.4 SQL 性能分析
+
+#### 7.4.1 SQL 执行频率
+
+MySQL 客户端连接成功后，通过 `SHOW [SESSION | GLOBAL] STATUS` 命令可以提供服务器状态信息。通过如下指令，可以查看当前数据库的 `INSERT`、`UPDATE`、`DELETE`、`SELECT` 的访问频次：
+
+<<< @/db/codes/mysql/status_show.sql
+
+#### 7.4.2 慢查询日志
+
+慢查询日志记录了所有执行时间超过指定参数（`long_query_time`，单位：秒，默认为 `10`）的所有 SQL 语句的日志。
+
+MySQL 的慢查询日志默认没有开启，需要在 MySQL 的配置文件（Ubuntu 默认在 `/etc/mysql/mysql.conf.d/mysqld.cnf`）配置如下信息：
+
+<<< @/db/codes/mysql/slow_query_log.cnf
+
+#### 7.4.3 PROFILE 详情
+
+`SHOW PROFILES` 能够在做 SQL 优化时帮助我们了解时间都耗到哪里去了。通过 `have_profiling` 参数，能够看到当前 MySQL 是否支持 profile 操作：
+
+<<< @/db/codes/mysql/have_profiling.sql
+
+默认 `profiling` 是关闭的，可以通过 `SET` 语句在 `SESSION/GLOBAL` 级别开启 `profiling`：
+
+<<< @/db/codes/mysql/set_profiling.sql
+
+执行一系列的业务 SQL 操作，然后通过如下指令查看执行耗时：
+
+<<< @/db/codes/mysql/profile_show.sql
+
+#### 7.4.4 `EXPLAIN` 执行计划
+
+`EXPLAIN` 或者 `DESC` 命令获取 MySQL 如何执行 `SELECT` 语句的信息，包括在 `SELECT` 语句执行过程中表如何连接和连接的顺序。
+
+语法：直接在 `SELECT` 语句前加关键字 `EXPLAIN` / `DESC`
+
+<<< @/db/codes/mysql/explain.sql
+
+`EXPLAIN` 执行计划各字段含义：
+
+- **`id`**：`SELECT` 查询的序列号，表示查询中执行 `SELECT` 子句或者是操作表的顺序（大 `id` 先执行，同 `id` 按顺序执行）
+- **`select_type`**：表示 `SELECT` 的类型，常见取值：
+  - `SIMPLE`：简单查询，无表连接或子查询
+  - `PRIMARY`：主查询，即外层的查询
+  - `UNION`：`UNION` 中的第二个或者后面的查询语句
+  - `SUBQUERY`：`SELECT` / `WHERE` 之后包含了子查询
+- **`type`**：连接类型，性能从好到差依次为：
+  1. `NULL`：不涉及表（如 `SELECT 1+1`）
+  2. `system`：表中只有一行数据（`const` 的特例，如系统表）
+  3. `const`：通过主键/唯一索引匹配到单行
+  4. `eq_ref`：多表连接中，被连接表通过唯一索引匹配
+  5. `ref`：通过普通索引匹配多行
+  6. `range`：索引范围扫描（如 `BETWEEN`、`IN`、`>` 等）
+  7. `index`：扫描整个索引树（不扫描数据行，比 `ALL` 快）
+  8. `ALL`：全表扫描（性能最差）
+- **`possible_keys`**：显示可能应用在这张表上的索引，一个或多个
+- **`key`**：实际使用的索引，如果为 `NULL`，则没有使用索引
+- **`key_len`**：表示索引中使用的字节数，该值为索引字段的最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
+- **`rows`**：MySQL 认为必须要执行查询的行数，在 InnoDB 引擎的表中，是一个估计值，不一定准确
+- **`filtered`**：表示返回结果的行数占需读取行数的百分比，该值越大越好
+
+### 7.5 使用规则
+
+#### 7.5.1 最左前缀原则
+
+如果索引了多列（联合索引），查询从索引的最左列开始，并且不跳过索引中的列。如果跳过某一列，后面的字段索引将失效
+
+<<< @/db/codes/mysql/combined_index.sql
+
+#### 7.5.2 范围查询
+
+联合索引中，出现范围查询（`>`、`<`），范围查询右侧的列索引失效
+
+<<< @/db/codes/mysql/combined_index_range.sql
+
+#### 7.5.3 索引失效
+
+以下情况会导致索引失效：
+
+- **索引字段参与运算**
+
+  如 `WHERE id + 1 = 10`（对 `id` 运算）、`WHERE SUBSTR(name, 1, 3) = "abc"`（函数处理）。
+
+- **字符串不加引号**
+
+  如 `WHERE name = 123`，会触发隐式类型转换，导致索引失效，应改为 `"123"`。
+
+- **`LIKE` 以通配符开头**
+
+  如 `WHERE name LIKE "%abc"`（前导模糊匹配），索引失效；而 `WHERE name LIKE "abc%"`（后缀模糊）可命中索引。
+
+- **使用 `OR` 连接非索引字段**
+
+  如 `WHERE idx_col = 1 OR no_idx_col = 2`（`no_idx_col` 无索引），会导致整个查询无法使用索引。
+
+- **数据分布影响**
+
+  如果 MySQL 评估使用索引比全表更慢，则不使用索引
+
+#### 7.5.4 SQL 提示
+
+SQL 提示，是优化数据库的一个重要手段，简单来说，就是在 SQL 语句中加入一些人为的提示来达到优化操作的目的。
+
+**`USE INDEX`**：
+
+<<< @/db/codes/mysql/index_use.sql
+
+**`IGNORE INDEX`**：
+
+<<< @/db/codes/mysql/index_ignore.sql
+
+**`FORCE INDEX`**：
+
+<<< @/db/codes/mysql/index_force.sql
+
+#### 7.5.5 覆盖索引
+
+尽量使用覆盖索引（查询使用了索引，并且需要返回的列在该索引中已经全部能够找到），减少 `SELECT *`。
+
+#### 7.5.6 前缀索引
+
+当字段类型为字符串（`VARCHAR`、`TEXT` 等）时，有时候需要索引很长的字符串，这会让索引变得更大，查询时，浪费大量磁盘 IO，影响查询效率。此时可以只将字符串的一小部分前缀，建立索引，这样大大节约索引空间，从而提高索引效率。
+
+<<< @/db/codes/mysql/index_prefix.sql
+
+可以根据索引的选择性来决定**前缀长度**，而选择性是指不重复的索引数（基数）和数据表的记录总数的比值，索引选择性越高则查询效率越高，唯一索引的选择性是 `1`，这是最好的选择性，性能也是最好的。
+
+<<< @/db/codes/mysql/index_prefix_len.sql
