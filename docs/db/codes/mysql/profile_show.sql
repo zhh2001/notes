@@ -1,6 +1,6 @@
 SELECT * FROM `tb_user`;
 SELECT * FROM `tb_user` WHERE `id` = 1;
-SELECT * FROM `tb_user` WHERE `name` = "zhang";
+SELECT * FROM `tb_user` WHERE `name` = 'zhang';
 
 -- 查看每一条 SQL 的基本耗时
 SHOW PROFILES;
@@ -12,7 +12,7 @@ SHOW PROFILES;
 -- |        3 | 0.00244425 | show tables                                    |
 -- |        4 | 0.00102350 | SELECT * FROM `tb_user`                        |
 -- |        5 | 0.00057375 | SELECT * FROM `tb_user` WHERE `id` = 1         |
--- |        6 | 0.00031300 | SELECT * FROM `tb_user` WHERE `name` = "zhang" |
+-- |        6 | 0.00031300 | SELECT * FROM `tb_user` WHERE `name` = 'zhang' |
 -- +----------+------------+------------------------------------------------+
 
 -- 查看指定 Query_ID 的 SQL 语句各个阶段的耗时情况

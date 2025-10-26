@@ -1,1 +1,1 @@
-SHOW VARIABLES LIKE "innodb_file_per_table";
+SHOW VARIABLES LIKE 'innodb_file_per_table';

@@ -120,6 +120,16 @@ const members = [
     ]
   },
   {
+    avatar: 'https://www.plsshenyun.top/ico/ico.png',
+    name: '望夜菌的小窝',
+    desc: 'change and challenge!',
+    links: [
+      { icon: linkIcon, link: 'https://www.plsshenyun.top/' },
+      { icon: mailIcon, link: 'mailto:blog@plsshenyun.top' },
+      { icon: 'rss', link: 'https://www.plsshenyun.top/feed' },
+    ]
+  },
+  {
     avatar: 'https://www.timochan.cn/api/objects/icon/9s6tbcvax674yv2m88.jpg',
     name: 'TimochanのBlog',
     desc: 'Let\'s start learning',

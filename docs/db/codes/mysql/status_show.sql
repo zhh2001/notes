@@ -1,4 +1,4 @@
-SHOW GLOBAL STATUS LIKE "Com\_______";
+SHOW GLOBAL STATUS LIKE 'Com\_______';
 -- +---------------+-------+
 -- | Variable_name | Value |
 -- +---------------+-------+
