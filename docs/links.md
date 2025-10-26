@@ -72,6 +72,18 @@ const members = [
     ]
   },
   {
+    avatar: 'https://blog.feng1026.top/avatar.jpg',
+    name: '枫落丰源',
+    desc: '和你的日常，就是奇迹',
+    links: [
+      { icon: linkIcon, link: 'https://blog.feng1026.top' },
+      { icon: mailIcon, link: 'mailto:qiufengluoye@feng1026.top' },
+      { icon: 'bilibili', link: 'https://space.bilibili.com/1735270180' },
+      { icon: 'steam', link: 'https://steamcommunity.com/id/qiufengluoye44/' },
+      { icon: 'github', link: 'https://github.com/Qiufengluoyes' },
+    ]
+  },
+  {
     avatar: 'https://hzz.cool/favicon.ico',
     name: '何智政个人博客',
     desc: '择善固执 守正出奇',
@@ -85,18 +97,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://blog.feng1026.top/avatar.jpg',
-    name: '枫落丰源',
-    desc: '和你的日常，就是奇迹',
-    links: [
-      { icon: linkIcon, link: 'https://blog.feng1026.top' },
-      { icon: mailIcon, link: 'mailto:qiufengluoye@feng1026.top' },
-      { icon: 'bilibili', link: 'https://space.bilibili.com/1735270180' },
-      { icon: 'steam', link: 'https://steamcommunity.com/id/qiufengluoye44/' },
-      { icon: 'github', link: 'https://github.com/Qiufengluoyes' },
-    ]
-  },
-  {
     avatar: 'https://img.cdn1.vip/i/68bbdee513eb9_1757142757.webp',
     name: 'LYEy_isine个人博客',
     desc: '花海无一日,少年踏自来',
@@ -107,6 +107,16 @@ const members = [
       { icon: 'steam', link: 'https://steamcommunity.com/id/LYEy_isine/' },
       { icon: 'github', link: 'https://github.com/caiyifeng0705' },
       { icon: 'rss', link: 'https://caiyifeng.top/rss.xml' },
+    ]
+  },
+  {
+    avatar: 'https://img520.com/iNvl5J.png',
+    name: '云野阁',
+    desc: '闲云野鹤，八方逍遥',
+    links: [
+      { icon: linkIcon, link: 'https://yyg.js.cool/' },
+      { icon: 'github', link: 'https://github.com/MarsperL' },
+      { icon: 'rss', link: 'https://yyg.js.cool/rss2.xml' },
     ]
   },
   {
@@ -206,7 +216,7 @@ const members = [
   {
     avatar: 'https://typonotes.com/logo/avatar.png',
     name: '老麦的书房',
-    desc: 'Go语言(golang)、 云原生、 DevOps、 可视化追踪。',
+    desc: 'Golang、 云原生、 DevOps、 可视化追踪',
     links: [
       { icon: linkIcon, link: 'https://typonotes.com' },
       { icon: 'github', link: 'https://github.com/tangx' },
@@ -217,7 +227,7 @@ const members = [
   {
     avatar: 'https://chenmingyong.cn/static/4aa6f9aeeee31495a9fb2cc6d2f7a1ca.jpg',
     name: '陈明勇的博客',
-    desc: '一名热爱技术、乐于分享的开发者，同时也是开源爱好者。',
+    desc: '一名热爱技术、乐于分享的开发者，同时也是开源爱好者',
     links: [
       { icon: linkIcon, link: 'https://chenmingyong.cn' },
       { icon: 'gmail', link: 'mailto:chenmingyong1999@gmail.com' },
@@ -287,7 +297,7 @@ const members = [
     name: 'Strike Freedom',
     org: 'GNET',
     orgLink: 'https://gnet.host',
-    desc: '潘少的博客、个人主页、技术分享：编程、动漫、读书、历史、随笔。',
+    desc: '潘少的博客、个人主页、技术分享：编程、动漫、读书、历史、随笔',
     links: [
       { icon: linkIcon, link: 'https://strikefreedom.top' },
       { icon: 'github', link: 'https://github.com/panjf2000' },

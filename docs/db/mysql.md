@@ -740,3 +740,39 @@ SQL 提示，是优化数据库的一个重要手段，简单来说，就是在 
 可以根据索引的选择性来决定**前缀长度**，而选择性是指不重复的索引数（基数）和数据表的记录总数的比值，索引选择性越高则查询效率越高，唯一索引的选择性是 `1`，这是最好的选择性，性能也是最好的。
 
 <<< @/db/codes/mysql/index_prefix_len.sql
+
+## 8 SQL 优化
+
+### 8.1 `INSERT` 优化
+
+#### 8.1.1 小批量插入数据
+
+<<< @/db/codes/mysql/optimize_insert_old.sql
+
+优化 1：改为批量插入
+
+<<< @/db/codes/mysql/optimize_insert_multi.sql
+
+优化 2：手动提交事务
+
+默认情况下，每句 DML 都是自动提交事务的。大量的插入语句会频繁的开启事务与提交事务。
+
+<<< @/db/codes/mysql/optimize_insert_transaction.sql
+
+优化 3：主键顺序插入
+
+```txt
+主键乱序插入：8 1 9 21 88 2 4 15 89 5 7 3
+主键顺序插入：1 2 3 4 5 7 8 9 15 21 88 89
+```
+
+#### 8.1.2 大批量插入数据
+
+如果一次性需要插入大批量数据，使用 `INSERT` 语句插入性能极低，此时可以使用 MySQL 数据库提供的 `LOAD` 指令进行插入。操作如下：
+
+<<< @/db/codes/mysql/load_infile.sh
+<<< @/db/codes/mysql/load_infile.sql
+
+### 8.2 主键优化
+
+
